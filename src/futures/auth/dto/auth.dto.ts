@@ -1,4 +1,5 @@
 import { IsOptional, IsString, IsUrl } from "class-validator";
+import { ROLE } from "../../../core/utils/enum";
 
 
 
@@ -23,6 +24,8 @@ export interface CreateUserDto {
 
     email: string
 
-    password: string
+    password: string,
+
+    role: ROLE
 
 }

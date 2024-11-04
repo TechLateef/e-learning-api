@@ -1,6 +1,6 @@
 import { S3Client } from "@aws-sdk/client-s3";
 import  * as multer from "multer";
-import * as multerS3 from "multer-s3";
+import  multerS3 from "multer-s3";
 import { v4 as uuidv4 } from "uuid";
 import * as path from "path";
 import { Request } from "express";

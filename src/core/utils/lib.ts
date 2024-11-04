@@ -32,7 +32,7 @@ const getStatus = (code: number) => {
             return "error";
         }
     } catch (error) {
-        return error.message;
+        return error;
     }
 };
 
@@ -64,7 +64,7 @@ const getStatusMessage = (code: number, extraInfo?: string) => {
             return extraInfo?.trim() || (FALLBACK_MESSAGES.UnprocessableEntityMsg);
         }
     } catch (error) {
-        return error.message;
+        return error;
     }
 };
 
