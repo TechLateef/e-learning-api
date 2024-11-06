@@ -1,8 +1,9 @@
 import { Column, CreateDateColumn, Entity, JoinTable, ManyToMany, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { Exclude } from "class-transformer";
-import { ROLE } from "../../../core/utils/enum";
+import { ROLE } from "../../../core/utils/enums";
 import { Course } from "../../course/entities/course.entity";
 import { Enrollment } from "../../enroll/entities/enrollment.entity";
+import { Accessment } from "../../accessment/entities/accessment.entity";
 
 
 @Entity()
@@ -44,6 +45,12 @@ export class User {
 
     @CreateDateColumn()
     accountCreateAt: Date;
+
+    @OneToMany(()=> Accessment, accessment => accessment.user)
+    accessments: Accessment[]
+
+    @OneToMany(()=> Accessment, accessment => accessment.instructor)
+    student_accessment: Accessment[]
 
     @UpdateDateColumn()
     updateAt: Date;

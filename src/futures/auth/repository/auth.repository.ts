@@ -5,7 +5,7 @@ import { User } from "../entities/auth.entity";
 import { encrypt } from "../../../core/utils/encrypt.utils";
 import { CreateUserDto } from "../dto/auth.dto";
 import { Repository } from "typeorm";
-import { ROLE } from "../../../core/utils/enum";
+import { ROLE } from "../../../core/utils/enums";
 import { response } from "express";
 
 

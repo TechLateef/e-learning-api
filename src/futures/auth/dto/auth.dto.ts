@@ -1,5 +1,5 @@
 import { IsOptional, IsString, IsUrl } from "class-validator";
-import { ROLE } from "../../../core/utils/enum";
+import { ROLE } from "../../../core/utils/enums";
 
 
 
