@@ -1,4 +1,4 @@
-# Social Media Platform API
+# E-learning Platform API
 
 This project involves building a comprehensive e-learning application where users can browse and enroll in courses, manage their accounts, and interact with instructors. The platform aims to provide a seamless experience for both learners and educators.
 
@@ -63,7 +63,7 @@ Here's an overview of the main API endpoints:
 - **Node.js** - JavaScript runtime
 - **Typescript** - 
 - **Express** - Web framework for Node.js
-- **MongoDB** - Database for storing user, post, and interaction data
+- **Postgresql** - Database for storing user, post, and interaction data
 
 ## Contributing
 
