@@ -1,5 +1,5 @@
 // /express.d.ts
-import { User } from './src/futures/auth/entities/auth.entity'
+import { User } from './src/futures/users/entities/user.entity'
 
 declare global {
     namespace Express {

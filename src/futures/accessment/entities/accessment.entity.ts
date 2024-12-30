@@ -1,7 +1,7 @@
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { ACCESSMENT_TYPES } from "../../../core/utils/enums";
 import { Course } from "../../course/entities/course.entity";
-import { User } from "../../auth/entities/auth.entity";
+import { User } from "../../users/entities/user.entity";
 
 @Entity('accessment')
 

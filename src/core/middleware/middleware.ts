@@ -3,7 +3,7 @@ import * as jwt from "jsonwebtoken";
 import { StatusCodes } from "http-status-codes";
 import { AppDataSource } from "../../data-source";
 import jsonResponse from "../utils/lib";
-import { User } from "../../futures/auth/entities/auth.entity";
+import { User } from "../../futures/users/entities/user.entity";
 
 // interface User {
 //     id: string;

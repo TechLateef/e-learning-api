@@ -1,7 +1,7 @@
 import { validate, ValidationError } from "class-validator";
 import { IRepository } from "../../../core/interface/IRepository";
 import { AppDataSource } from "../../../data-source";
-import { User } from "../entities/auth.entity";
+import { User } from "../../users/entities/user.entity";
 import { encrypt } from "../../../core/utils/encrypt.utils";
 import { CreateUserDto } from "../dto/auth.dto";
 import { Repository } from "typeorm";

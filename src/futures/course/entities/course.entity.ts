@@ -1,7 +1,7 @@
 import { Column, CreateDateColumn, Entity, ManyToMany, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
-import { User } from "../../auth/entities/auth.entity";
+import { User } from "../../users/entities/user.entity";
 import { Module } from "../../modules/entities/module.entity";
-import { Enrollment } from "../../enroll/entities/enrollment.entity";
+import { Enrollment } from "../../enrollment/entities/enrollment.entity";
 import { Accessment } from "../../accessment/entities/accessment.entity";
 
 

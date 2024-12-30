@@ -1,4 +1,4 @@
-import { IsOptional, IsString, IsUrl } from "class-validator";
+import { IsNotEmpty, IsOptional, IsString, IsUrl } from "class-validator";
 import { ROLE } from "../../../core/utils/enums";
 
 
@@ -18,14 +18,14 @@ export class EditProfileDto {
 }
 
 
-
-export interface CreateUserDto {
-    username: string
-
-    email: string
-
-    password: string,
-
-    role: ROLE
-
+export class LoginDTO {
+       @IsString()
+        @IsNotEmpty()
+        email: string
+    
+        @IsString()
+        @IsNotEmpty()
+        password: string
+    
 }
+
