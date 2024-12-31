@@ -41,6 +41,9 @@ export class User {
     @Column({ nullable: true })
     otp: string |  null;
 
+    @Column({ nullable: true})
+    verified: boolean;
+
     @Column({ type: "enum", enum: ROLE })
     role: ROLE;
 
@@ -63,6 +66,21 @@ export class User {
 
     @Column({ default: false })
     twoFactorEnabled: boolean;
+
+    @Column({ nullable: true, default: false})
+    twoFactVerified: boolean;
+
+    @Column({ nullable: true })
+    otpAscii: string;
+
+    @Column({ nullable: true })
+    otpHex: string;
+
+    @Column({ nullable: true })
+    otpBase32: string;
+    
+    @Column({ nullable: true })
+    otpAuthUrl: string;
 
     @Column({ nullable: true })
     passwordResetOTP: string | null;

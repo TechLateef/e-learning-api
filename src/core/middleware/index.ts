@@ -1,10 +1,12 @@
 
-import  cookieParser from 'cookie-parser'
-import helmet  from 'helmet'
-import xss  from 'xss'
-import  cors from 'cors'
+import cookieParser from 'cookie-parser'
+import helmet from 'helmet'
+import xss from 'xss'
+import cors from 'cors'
 import { urlencoded, json, raw } from 'express'
-import  bodyParser from 'body-parser';
+import bodyParser from 'body-parser';
+import morgan from 'morgan'
+import { Request, Response } from 'express'
 
 /**
  * Registers all custome and external middlewares
@@ -12,20 +14,30 @@ import  bodyParser from 'body-parser';
  */
 const middlewaresRegister = (app: any) => {
 
-var corsOptions = {
-  origin: "*",
-  methods:['GET', 'PUT', 'POST', 'PATCH','DELETE'],
-  optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true,
-}
+  var corsOptions = {
+    origin: "*",
+    methods: ['GET', 'PUT', 'POST', 'PATCH', 'DELETE'],
+    optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true,
+  }
+  app.use(morgan('dev'));
   app.use(cors(corsOptions))
   app.use(cookieParser())
   app.use(helmet())
-//   app.use(xss());
+
+  //   app.use(xss());
   app.use(bodyParser.json());
   app.use(bodyParser.urlencoded({ extended: true }));
 
+
+  // Catch All
+  app.all("*", (req: Request, res: Response) => {
+    return res.status(404).json({
+      status: "fail",
+      message: `Route: ${req.originalUrl} not found`,
+    });
+  });
 }
 
 export default middlewaresRegister

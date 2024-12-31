@@ -11,6 +11,9 @@ import { encrypt } from "../../../core/utils/encrypt.utils";
 import { Snowflake } from "@theinternetfolks/snowflake";
 import { generate } from "otp-generator";
 import { EmailService } from "../../email/email.service";
+import * as OTPAuth from "otpauth";
+import { encode } from "hi-base32";
+import crypto from "crypto";
 
 export class AuthService {
     constructor(private readonly userService: UserService, private readonly studentService: StudentService, private readonly instructorService: InstructorService) {
@@ -133,6 +136,35 @@ export class AuthService {
         }
     }
 
+
+    /**
+     * @description verify user account using provided OTP
+     * @param otp string 
+     * @param res Express Response
+     * @returns void
+     */
+
+    async verifyAccount(otp: string, res: Response) {
+        try {
+            const hashedOtp = await encrypt.encryptdata(otp);
+            const user = await this.userService.findUserByOTP(hashedOtp);
+            // Validate user and OTP expiry
+            const currentTime = new Date();
+            if (!user || currentTime > user.otpExpiresAt!) {
+                jsonResponse(StatusCodes.NOT_FOUND, '', res, 'Invalid OTP or OTP has expired');
+                return;
+            }
+
+            await this.userService.updateUser(user, { verified: true });
+
+            jsonResponse(StatusCodes.OK, '', res, 'Account verified ✅ please login')
+        } catch (error) {
+            console.error(error);
+            jsonResponse(StatusCodes.INTERNAL_SERVER_ERROR, '', res, `Error verifying user account: ${error}`)
+        }
+
+    }
+
     /**
      * @description Updates the user password using the provided OTP and new password.
      * @param details ResetPasswordDTO - Contains OTP and newPassword.
@@ -144,7 +176,7 @@ export class AuthService {
             const { OTP, newPassword } = details;
 
             // Find user by OTP
-            const hashedOtp = await encrypt.encryptdata(OTP); // Ensure encryptdata properly hashes OTP
+            const hashedOtp = await encrypt.encryptdata(OTP);
             const user = await this.userService.findUserByOTP(hashedOtp);
 
             // Validate user and OTP expiry
@@ -176,4 +208,101 @@ export class AuthService {
     }
 
 
+    async generateRandomBase32() {
+        const buffer = crypto.randomBytes(15);
+        const base32 = encode(buffer).replace(/=/g, "").substring(0, 24);
+        return base32;
+    };
+
+
+    /**
+     * @description generate OTP for Two factor Authentiaction
+     * @param userId string user uniquer Id
+     * @param res Express Response
+     * @returns 
+     */
+    async generateOTP(userId: string, res: Response) {
+        try {
+            const user = await this.userService.getUserById(userId);
+            if (!user) {
+                jsonResponse(StatusCodes.NOT_FOUND, '', res, 'User not found');
+                return;
+            }
+            const base32Secret = await this.generateRandomBase32();
+
+            let totp = new OTPAuth.TOTP({
+                issuer: "codevoweb.com",
+                label: "CodevoWeb",
+                algorithm: "SHA1",
+                digits: 6,
+                secret: base32Secret,
+            });
+
+            let otpAuthUrl = totp.toString();
+            await this.userService.updateUser(user, { otpAuthUrl, otpBase32: base32Secret });
+            jsonResponse(StatusCodes.OK, '', res)
+        } catch (error) {
+            console.error(error);
+            jsonResponse(StatusCodes.INTERNAL_SERVER_ERROR, '', res, `Error generatingOTP: ${error}`);
+        }
+    }
+
+
+    async verfyOTP(token: string, userId: string, res: Response) {
+        try {
+            const user = await this.userService.getUserById(userId);
+            const message = "Token is invalid or User doesn't exist";
+            if (!user) {
+                jsonResponse(StatusCodes.NOT_FOUND, '', res, message);
+                return;
+            }
+
+            const totp = new OTPAuth.TOTP({
+                issuer: "codevoweb.com",
+                label: "CodevoWeb",
+                algorithm: "SHA1",
+                digits: 6,
+                secret: user.otpBase32,
+            });
+            const delta = totp.validate({ token });
+            if (delta === null) {
+                jsonResponse(StatusCodes.BAD_REQUEST, '', res, message);
+            };
+            const updatedUser = await this.userService.updateUser(user, { twoFactorEnabled: true, twoFactVerified: true });
+
+            jsonResponse(StatusCodes.OK, updatedUser, res);
+        } catch (error) {
+            console.error(error)
+            jsonResponse(StatusCodes.INTERNAL_SERVER_ERROR, '', res, `Error verifying OTP: ${error} `)
+        }
+
+    }
+
+    async validateOTP(token: string, userId: string, res: Response) {
+        try {
+            const user = await this.userService.getUserById(userId);
+            const message = "Token is invalid or user doesn't exist";
+            if (!user) {
+                jsonResponse(StatusCodes.BAD_REQUEST, '', res, message);
+                return;
+            }
+            let totp = new OTPAuth.TOTP({
+                issuer: "codevoweb.com",
+                label: "CodevoWeb",
+                algorithm: "SHA1",
+                digits: 6,
+                secret: user.otpBase32,
+            });
+            let delta = totp.validate({ token, window: 1 });
+            if (delta === null) {
+                jsonResponse(StatusCodes.BAD_REQUEST, '', res, message);
+                return;
+            }
+            jsonResponse(StatusCodes.OK, { otp_Valide: true }, res)
+
+        } catch (error) {
+            console.error(error);
+            jsonResponse(StatusCodes.INTERNAL_SERVER_ERROR, '', res, `Error valiadting OTP: ${error}`)
+        }
+    }
 }
