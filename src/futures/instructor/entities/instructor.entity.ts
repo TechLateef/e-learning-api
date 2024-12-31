@@ -3,7 +3,7 @@ import { Course } from "../../course/entities/course.entity";
 import { Accessment } from "../../accessment/entities/accessment.entity";
 import { User } from "../../users/entities/user.entity";
 
-@Entity()
+@Entity({ name: 'access_instructor'})
 export class Instructor {
   @PrimaryGeneratedColumn('uuid')
   id: string;

@@ -29,3 +29,13 @@ export class LoginDTO {
     
 }
 
+export class ResetPasswordDTO {
+
+    @IsString()
+    @IsNotEmpty()
+    OTP: string;
+
+    @IsString()
+    @IsNotEmpty()
+    newPassword: string;
+}

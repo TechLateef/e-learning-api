@@ -2,7 +2,7 @@ import { Entity, OneToMany, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from
 import { Enrollment } from "../../enrollment/entities/enrollment.entity";
 import { User } from "../../users/entities/user.entity";
 
-@Entity()
+@Entity({ name: 'access_student'})
 export class Student {
     @PrimaryGeneratedColumn('uuid')
     id: string;

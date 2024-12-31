@@ -15,7 +15,7 @@ import { Accessment } from "../../accessment/entities/accessment.entity";
 import { Instructor } from "../../instructor/entities/instructor.entity";
 import { Student } from "../../students/entities/student.entity";
 import * as bcrypt from 'bcryptjs';
-@Entity()
+@Entity({ name: 'access_user'})
 export class User {
     @PrimaryGeneratedColumn("uuid")
     id: string;
@@ -37,6 +37,9 @@ export class User {
 
     @Column({ nullable: true })
     phone: string;
+
+    @Column({ nullable: true })
+    otp: string |  null;
 
     @Column({ type: "enum", enum: ROLE })
     role: ROLE;
@@ -62,12 +65,15 @@ export class User {
     twoFactorEnabled: boolean;
 
     @Column({ nullable: true })
-    passwordResetToken: string;
+    passwordResetOTP: string | null;
 
     @Column({ nullable: true })
-    resetTokenExpiresAt: number;
+    resetOTPExpiresAt: Date;
 
-    @OneToMany(() => Accessment, (accessment) => accessment.user)
+    @Column({ nullable: true })
+    otpExpiresAt: Date | null;    
+
+    @OneToMany(() => Accessment, (accessment) => accessment.student)
     accessments: Accessment[];
 
     /**
@@ -76,10 +82,17 @@ export class User {
 
     @BeforeInsert()
     @BeforeUpdate()
-    async hashPassword() {
-        if (this.password) {
-            const salt = await bcrypt.genSalt(10);
-            this.password = await bcrypt.hashSync(this.password, salt);
+    async hashPasswordAndOTP() {
+        const salt = await bcrypt.genSalt(10);
+    
+        // Hash password if it's present and not already hashed
+        if (this.password && !bcrypt.getRounds(this.password)) {
+            this.password = await bcrypt.hash(this.password, salt);
+        }
+    
+        // Hash OTP if it's present and not already hashed
+        if (this.otp && !bcrypt.getRounds(this.otp)) {
+            this.otp = await bcrypt.hash(this.otp, salt);
         }
     }
 

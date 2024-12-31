@@ -1,9 +1,10 @@
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { ACCESSMENT_TYPES } from "../../../core/utils/enums";
 import { Course } from "../../course/entities/course.entity";
-import { User } from "../../users/entities/user.entity";
+import { Instructor } from "../../instructor/entities/instructor.entity";
+import { Student } from "../../students/entities/student.entity";
 
-@Entity('accessment')
+@Entity({ name:'access_accessment'})
 
 export class Accessment {
     @PrimaryGeneratedColumn()
@@ -24,9 +25,9 @@ export class Accessment {
     @ManyToOne(() => Course, course => course.accessments)
     course: Course
 
-    @ManyToOne(() => User, user => user.accessments)
-    user: User;
+    @ManyToOne(() => Student, Student => Student.user)
+    student: Student;
 
-    @ManyToOne(() => User, user => user.student_accessment)
-    instructor: User
+    @ManyToOne(() => Instructor, instructor => instructor.studentAccessments)
+    instructor: Instructor
 }
