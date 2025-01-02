@@ -1,18 +1,20 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
-// import { AuthService } from "../service/auth.service";
-// import { AuthController } from "../controller/auth.controller";
+const auth_controller_1 = require("../controller/auth.controller");
+const dtoValidationMiddleware_1 = require("../../../core/middleware/dtoValidationMiddleware");
+const createUser_dto_1 = require("../../users/dtos/createUser.dto");
+const auth_dto_1 = require("../dto/auth.dto");
+const service_factory_1 = require("../../../core/factories/service.factory");
 const authRouter = (0, express_1.Router)();
-// const authService = new AuthService()
-// const authCcontroller = new AuthController(authService)
-// // Route for user rehisteration
-// authRouter.post('/signup', (req, res, next) => authCcontroller.signUp(req, res, next))
-// //Route to login user
-// authRouter.post('/login', (req, res, next) => authCcontroller.login(req, res, next))
-// //Route for getting user profile
-// authRouter.get('/get-user', (req, res, next) => authCcontroller.getUserByUsername(req, res, next))
-// //Route to edit user Profile
-// authRouter.patch('/edit-profile', (req, res, next) => authCcontroller.editProfile(req, res, next))
-// //Route for follow or unfollow user
-// authRouter.patch('/follow-or-unfollow', (req, res, next) => authCcontroller.followOrUnfollow(req, res, next))
+const authService = service_factory_1.ServiceFactory.getAuthService();
+const authController = new auth_controller_1.AuthController(authService);
+// Route for user rehisteration
+authRouter.post('/signup', (0, dtoValidationMiddleware_1.dtoValidationMiddleware)(createUser_dto_1.CreateUserDto), authController.signup);
+//Route to login user
+authRouter.post('/login', (0, dtoValidationMiddleware_1.dtoValidationMiddleware)(auth_dto_1.LoginDTO), authController.login);
+authRouter.post('/verify-account', authController.verifyAccount);
+authRouter.post('/generate-otp', (0, dtoValidationMiddleware_1.dtoValidationMiddleware)(auth_dto_1.GenerateOTPDto), authController.generateOtp);
+authRouter.post('/enable-2fa', (0, dtoValidationMiddleware_1.dtoValidationMiddleware)(auth_dto_1.VerifyAndEnable2FADto), authController.verifyAndEnable2FA);
+authRouter.post('/validate-2fa', (0, dtoValidationMiddleware_1.dtoValidationMiddleware)(auth_dto_1.TwoFAValidationDTO), authController.verifyOtpToLogin);
+exports.default = authRouter;

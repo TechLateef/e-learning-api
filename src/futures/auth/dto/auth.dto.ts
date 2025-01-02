@@ -19,14 +19,14 @@ export class EditProfileDto {
 
 
 export class LoginDTO {
-       @IsString()
-        @IsNotEmpty()
-        email: string
-    
-        @IsString()
-        @IsNotEmpty()
-        password: string
-    
+    @IsString()
+    @IsNotEmpty()
+    email: string
+
+    @IsString()
+    @IsNotEmpty()
+    password: string
+
 }
 
 export class ResetPasswordDTO {
@@ -38,4 +38,30 @@ export class ResetPasswordDTO {
     @IsString()
     @IsNotEmpty()
     newPassword: string;
+}
+
+export class TwoFAValidationDTO {
+    @IsString()
+    @IsNotEmpty()
+    tempToken: string;
+
+    @IsString()
+    @IsNotEmpty()
+    otp: string;
+}
+
+export class VerifyAndEnable2FADto {
+    @IsString()
+    @IsNotEmpty()
+    otp: string;
+
+    @IsString()
+    @IsNotEmpty()
+    userId: string;
+}
+export class GenerateOTPDto {
+
+    @IsString()
+    @IsNotEmpty()
+    userId: string;
 }

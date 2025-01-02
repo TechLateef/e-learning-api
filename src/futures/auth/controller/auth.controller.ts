@@ -1,0 +1,154 @@
+import { RequestHandler } from "express";
+import { AuthService } from "../service/auth.service";
+import jsonResponse from "../../../core/utils/lib";
+import { StatusCodes } from "http-status-codes";
+
+
+
+
+export class AuthController {
+    constructor(private readonly authService: AuthService) { }
+
+    /**
+     * @description this function create new User
+     * @access public
+     * @param req Express Request
+     * @param res Express Response
+     * @param next Express NextFunction
+     */
+    signup: RequestHandler = async (req, res, next) => {
+        try {
+
+            const user = await this.authService.signUp(req.body, res);
+            jsonResponse(StatusCodes.OK, user, res);
+        } catch (error) {
+            console.error(error);
+            next(error);
+        }
+    }
+    /**
+     * @description this function login user using provided email and password
+     * @access public
+     * @param req Express Request
+     * @param res Express Response
+     * @param next Express NextFunction
+     */
+    login: RequestHandler = async (req, res, next) => {
+        try {
+            const result = await this.authService.login(req.body, res);
+            jsonResponse(StatusCodes.OK, result, res);
+        } catch (error) {
+            console.error(error);
+            next(error);
+        }
+    }
+
+    /**
+    * @description Verify user account using provided dto
+    * @access public
+    * @param req Express Request
+    * @param res Express Response
+    * @param next Express NextFunction
+    */
+    verifyAccount: RequestHandler = async (req, res, next) => {
+        try {
+            const message = await this.authService.verifyAccount(req.body, res);
+
+            jsonResponse(StatusCodes.OK, '', res, message as string)
+        } catch (error) {
+            console.error(error);
+            next(error);
+
+        }
+
+    }
+    /**
+     * @description this function send otp email provided by user  
+     * @access public
+     * @param req Express Request
+     * @param res Express Response
+     * @param next Express NextFunction
+     */
+    forgetPassword: RequestHandler = async (req, res, next) => {
+        try {
+            const result = await this.authService.forgetPassword(req.body, res);
+            jsonResponse(StatusCodes.OK, '', res, result as string);
+        } catch (error) {
+            console.error(error);
+            next(error);
+        }
+    }
+
+    /**  
+     * @description this function reset user password to new password provided 
+     * @access public
+     * @param req Express Request
+     * @param res Express Response
+     * @param next Express NextFunction
+     */
+    resetPassword: RequestHandler = async (req, res, next) => {
+        try {
+            const response = await this.authService.resetpassword(req.body, res);
+            jsonResponse(StatusCodes.OK, '', res, response as string)
+
+        } catch (error) {
+            console.error(error)
+            next(error);
+        }
+    }
+
+    /**   
+     * @description Generate otp for 2FA and return otp url
+     * @access private
+     * @param req Express Request
+     * @param res Express Response
+     * @param next Express NextFunction
+     */
+    generateOtp: RequestHandler = async (req, res, next) => {
+        try {
+            const otpurl = await this.authService.generateOTP(req.body, res);
+            jsonResponse(StatusCodes.OK, otpurl, res);
+        } catch (error) {
+            console.error(error);
+            next(error);
+        }
+    }
+
+
+
+    /**   
+     * @description Verify otp and enable 2FA
+     * @access private
+     * @param req Express Request
+     * @param res Express Response
+     * @param next Express NextFunction
+     */
+    verifyAndEnable2FA: RequestHandler = async (req, res, next) => {
+        try {
+            const response = await this.authService.verifyOTP(req.body, res);
+            jsonResponse(StatusCodes.OK, response, res);
+
+        } catch (error) {
+            console.error(error);
+            next(error);
+        }
+    }
+
+      /**   
+     * @description Verify otp to login
+     * @access private
+     * @param req Express Request
+     * @param res Express Response
+     * @param next Express NextFunction
+     */
+    verifyOtpToLogin: RequestHandler = async (req, res, next) => {
+        try {
+            const response = await this.authService.validateOTP(req.body, res);
+            jsonResponse(StatusCodes.OK, response, res);
+
+        } catch (error) {
+            console.error(error);
+            next(error);
+        }
+    }
+}

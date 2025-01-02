@@ -15,7 +15,7 @@
    "noImplicitAny": true,
    "strictPropertyInitialization": false
   },
-  "include": ["src/**/*","./express.d.ts"],
+  "include": ["src/**/*","index.ts","./express.d.ts"],
   "exclude": ["node_modules", "dist"],
   "ts-node": {
    "files": true

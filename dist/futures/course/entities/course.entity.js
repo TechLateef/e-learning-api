@@ -11,9 +11,10 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Course = void 0;
 const typeorm_1 = require("typeorm");
-const auth_entity_1 = require("../../auth/entities/auth.entity");
 const module_entity_1 = require("../../modules/entities/module.entity");
-const enrollment_entity_1 = require("../../enroll/entities/enrollment.entity");
+const enrollment_entity_1 = require("../../enrollment/entities/enrollment.entity");
+const accessment_entity_1 = require("../../accessment/entities/accessment.entity");
+const instructor_entity_1 = require("../../instructor/entities/instructor.entity");
 let Course = class Course {
 };
 exports.Course = Course;
@@ -22,7 +23,7 @@ __decorate([
     __metadata("design:type", Number)
 ], Course.prototype, "id", void 0);
 __decorate([
-    (0, typeorm_1.ManyToMany)(() => auth_entity_1.User, user => user.courses),
+    (0, typeorm_1.ManyToMany)(() => instructor_entity_1.Instructor, instructor => instructor.courses),
     __metadata("design:type", Array)
 ], Course.prototype, "instructors", void 0);
 __decorate([
@@ -37,6 +38,10 @@ __decorate([
     (0, typeorm_1.OneToMany)(() => module_entity_1.Module, module => module.course),
     __metadata("design:type", Array)
 ], Course.prototype, "modules", void 0);
+__decorate([
+    (0, typeorm_1.OneToMany)(() => accessment_entity_1.Accessment, accessment => accessment.course),
+    __metadata("design:type", Array)
+], Course.prototype, "accessments", void 0);
 __decorate([
     (0, typeorm_1.Column)(),
     __metadata("design:type", String)

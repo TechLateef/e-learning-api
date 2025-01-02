@@ -11,10 +11,12 @@ import "reflect-metadata";
 
 import { AppDataSource } from './src/data-source'
 
-import * as session from 'express-session';
+import session from 'express-session';
 
 /* Configure Environment Variables */
 import 'dotenv/config'
+
+console.log('getting ready');
 
 const { PORT = 3000 } = process.env;
 
@@ -22,12 +24,13 @@ const { PORT = 3000 } = process.env;
 import app from './src/index'
 
 
+
 // Configure session middleware
-app.use(session({
-    secret: process.env.SESSION_SECRET || "",
-    resave: false,
-    saveUninitialized: false,
-}));
+// app.use(session ({
+//     secret: process.env.SESSION_SECRET || "",
+//     resave: false,
+//     saveUninitialized: false,
+// }));
 
 
 

@@ -3,6 +3,7 @@ import { User } from "../../users/entities/user.entity";
 import { Module } from "../../modules/entities/module.entity";
 import { Enrollment } from "../../enrollment/entities/enrollment.entity";
 import { Accessment } from "../../accessment/entities/accessment.entity";
+import { Instructor } from "../../instructor/entities/instructor.entity";
 
 
 @Entity('course')
@@ -10,8 +11,8 @@ export class Course {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @ManyToMany(() => User, user => user.courses)
-    instructors: User[]
+    @ManyToMany(() => Instructor, instructor => instructor.courses)
+    instructors: Instructor[]
 
     @Column()
     duration: number;

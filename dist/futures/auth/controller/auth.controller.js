@@ -1,112 +1,148 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthController = void 0;
-const requireFieldHandler_1 = require("../../../core/utils/requireFieldHandler");
+const lib_1 = __importDefault(require("../../../core/utils/lib"));
 const http_status_codes_1 = require("http-status-codes");
-const class_transformer_1 = require("class-transformer");
-const auth_dto_1 = require("../dto/auth.dto");
-const class_validator_1 = require("class-validator");
 class AuthController {
     constructor(authService) {
         this.authService = authService;
         /**
-         * @description register new user
+         * @description this function create new User
          * @access public
-         * @router POST /signup
          * @param req Express Request
          * @param res Express Response
          * @param next Express NextFunction
          */
-        this.signUp = async (req, res, next) => {
+        this.signup = async (req, res, next) => {
             try {
-                const { username, email, password } = req.body;
-                const requireFields = ['username', 'email', 'password'];
-                requireFieldHandler_1.RequireFieldHandler.Requiredfield(req, res, requireFields);
-                const newUser = await this.authService.createUser({ username, email, password });
-                if (!newUser) {
-                    throw new Error('Error: User not Registered');
-                }
-                res.status(http_status_codes_1.StatusCodes.OK).json({ message: "success", newUser });
+                const user = await this.authService.signUp(req.body, res);
+                (0, lib_1.default)(http_status_codes_1.StatusCodes.OK, user, res);
             }
             catch (error) {
                 console.error(error);
-                throw new Error(`Error Registering user ${error}`);
-            }
-        };
-        /**
-            * @description Login  user
-            * @access public
-            * @router POST /login
-            * @param req Express Request
-            * @param res Express Response
-            * @param next Express NextFunction
-            */
-        this.login = async (req, res, next) => {
-            try {
-                const { email, password } = req.body;
-                if (!email || !password) {
-                    throw new Error('Invalid email or password');
-                }
-                const user = await this.authService.login(email, password);
-                if (!user) {
-                    res.status(http_status_codes_1.StatusCodes.INTERNAL_SERVER_ERROR).json(user);
-                }
-            }
-            catch (error) {
-                next(error);
-            }
-        };
-        this.editProfile = async (req, res, next) => {
-            var _a;
-            try {
-                const editProfileData = (0, class_transformer_1.plainToClass)(auth_dto_1.EditProfileDto, req.body);
-                const errors = await (0, class_validator_1.validate)(editProfileData);
-                if (errors.length > 0) {
-                    res.status(400).json({ errors: errors.map(error => error.toString()) });
-                }
-                const editedProfile = await this.authService.editProfile(editProfileData, (_a = req.user) === null || _a === void 0 ? void 0 : _a.id);
-                res.status(http_status_codes_1.StatusCodes.OK).json({ message: 'success', editedProfile });
-            }
-            catch (error) {
                 next(error);
             }
         };
         /**
-         * @description get User profile with username
-         * @access private
-         * @route GET /get-user
+         * @description this function login user using provided email and password
+         * @access public
          * @param req Express Request
          * @param res Express Response
-         * @param next
+         * @param next Express NextFunction
          */
-        this.getUserByUsername = async (req, res, next) => {
+        this.login = async (req, res, next) => {
             try {
-                const username = req.body.username;
-                const isUser = await this.authService.getUserByUsername(username);
-                res.status(http_status_codes_1.StatusCodes.OK).json({ message: "Success", isUser });
+                const result = await this.authService.login(req.body, res);
+                (0, lib_1.default)(http_status_codes_1.StatusCodes.OK, result, res);
             }
             catch (error) {
+                console.error(error);
                 next(error);
             }
         };
         /**
-         * @description follow or unfollow user depending on if they are already following each other or not
-         * @access private
-         * @route PATCH /follow-or-unfollow
-         * @param req
-         * @param res
-         * @param next
-         */
-        this.followOrUnfollow = async (req, res, next) => {
+        * @description Verify user account using provided dto
+        * @access public
+        * @param req Express Request
+        * @param res Express Response
+        * @param next Express NextFunction
+        */
+        this.verifyAccount = async (req, res, next) => {
             try {
-                const targetUserId = req.params.targetUserId;
-                const currentUser = req.user;
-                const followOrUnFollow = await this.authService.followOrUnfollow(targetUserId, currentUser);
-                res.status(http_status_codes_1.StatusCodes.OK).json({ message: 'Success', followOrUnFollow });
+                const message = await this.authService.verifyAccount(req.body, res);
+                (0, lib_1.default)(http_status_codes_1.StatusCodes.OK, '', res, message);
             }
             catch (error) {
                 console.error(error);
-                throw new Error("Internal server Error, Our team are working on it");
+                next(error);
+            }
+        };
+        /**
+         * @description this function send otp email provided by user
+         * @access public
+         * @param req Express Request
+         * @param res Express Response
+         * @param next Express NextFunction
+         */
+        this.forgetPassword = async (req, res, next) => {
+            try {
+                const result = await this.authService.forgetPassword(req.body, res);
+                (0, lib_1.default)(http_status_codes_1.StatusCodes.OK, '', res, result);
+            }
+            catch (error) {
+                console.error(error);
+                next(error);
+            }
+        };
+        /**
+         * @description this function reset user password to new password provided
+         * @access public
+         * @param req Express Request
+         * @param res Express Response
+         * @param next Express NextFunction
+         */
+        this.resetPassword = async (req, res, next) => {
+            try {
+                const response = await this.authService.resetpassword(req.body, res);
+                (0, lib_1.default)(http_status_codes_1.StatusCodes.OK, '', res, response);
+            }
+            catch (error) {
+                console.error(error);
+                next(error);
+            }
+        };
+        /**
+         * @description Generate otp for 2FA and return otp url
+         * @access private
+         * @param req Express Request
+         * @param res Express Response
+         * @param next Express NextFunction
+         */
+        this.generateOtp = async (req, res, next) => {
+            try {
+                const otpurl = await this.authService.generateOTP(req.body, res);
+                (0, lib_1.default)(http_status_codes_1.StatusCodes.OK, otpurl, res);
+            }
+            catch (error) {
+                console.error(error);
+                next(error);
+            }
+        };
+        /**
+         * @description Verify otp and enable 2FA
+         * @access private
+         * @param req Express Request
+         * @param res Express Response
+         * @param next Express NextFunction
+         */
+        this.verifyAndEnable2FA = async (req, res, next) => {
+            try {
+                const response = await this.authService.verifyOTP(req.body, res);
+                (0, lib_1.default)(http_status_codes_1.StatusCodes.OK, response, res);
+            }
+            catch (error) {
+                console.error(error);
+                next(error);
+            }
+        };
+        /**
+       * @description Verify otp to login
+       * @access private
+       * @param req Express Request
+       * @param res Express Response
+       * @param next Express NextFunction
+       */
+        this.verifyOtpToLogin = async (req, res, next) => {
+            try {
+                const response = await this.authService.validateOTP(req.body, res);
+                (0, lib_1.default)(http_status_codes_1.StatusCodes.OK, response, res);
+            }
+            catch (error) {
+                console.error(error);
+                next(error);
             }
         };
     }

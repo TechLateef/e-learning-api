@@ -31,7 +31,7 @@ const jwt = __importStar(require("jsonwebtoken"));
 const http_status_codes_1 = require("http-status-codes");
 const data_source_1 = require("../../data-source");
 const lib_1 = __importDefault(require("../utils/lib"));
-const auth_entity_1 = require("../../futures/auth/entities/auth.entity");
+const user_entity_1 = require("../../futures/users/entities/user.entity");
 // interface User {
 //     id: string;
 //     firstName: string;
@@ -60,7 +60,7 @@ const authenticationMiddleware = async (req, res, next) => {
         const { id, iat } = decoded;
         // verify if user still exists
         // console.log("user", decoded)
-        const userRepository = data_source_1.AppDataSource.getRepository(auth_entity_1.User);
+        const userRepository = data_source_1.AppDataSource.getRepository(user_entity_1.User);
         const user = await userRepository.findOne({ where: { id: decoded.id } });
         if (!user) {
             return next(new Error("The user with this token no longer exists"));

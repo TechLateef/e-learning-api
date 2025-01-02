@@ -5,14 +5,14 @@ import { v4 as uuidv4 } from "uuid";
 import * as path from "path";
 import { Request } from "express";
 
-
+import 'dotenv/config'
 // Create S3 instance using S3Client
 const s3 = new S3Client({
   credentials: {
     secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY || '',
     accessKeyId: process.env.AWS_ACCESS_KEY_ID || '',
   },
-  region: process.env.AWS_REGION || '',
+  region: process.env.AWS_REGION,
 });
 
 /**

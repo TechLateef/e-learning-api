@@ -39,7 +39,7 @@ export class User {
     phone: string;
 
     @Column({ nullable: true })
-    otp: string |  null;
+    otp: string;
 
     @Column({ nullable: true})
     verified: boolean;
@@ -83,13 +83,13 @@ export class User {
     otpAuthUrl: string;
 
     @Column({ nullable: true })
-    passwordResetOTP: string | null;
+    passwordResetOTP: string;
 
     @Column({ nullable: true })
     resetOTPExpiresAt: Date;
 
     @Column({ nullable: true })
-    otpExpiresAt: Date | null;    
+    otpExpiresAt: Date;    
 
     @OneToMany(() => Accessment, (accessment) => accessment.student)
     accessments: Accessment[];

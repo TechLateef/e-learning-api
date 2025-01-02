@@ -31,13 +31,7 @@ const middlewaresRegister = (app: any) => {
   app.use(bodyParser.urlencoded({ extended: true }));
 
 
-  // Catch All
-  app.all("*", (req: Request, res: Response) => {
-    return res.status(404).json({
-      status: "fail",
-      message: `Route: ${req.originalUrl} not found`,
-    });
-  });
+
 }
 
 export default middlewaresRegister

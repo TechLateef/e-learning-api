@@ -11,14 +11,14 @@ const crypto_1 = require("crypto");
 dotenv_1.default.config();
 const { JWT_SECRET = "" } = process.env;
 class encrypt {
-    static async encryptpass(password) {
+    static async encryptdata(plainString) {
         // Generate salt dynamically with a cost factor of 10
         const salt = await bcryptjs_1.default.genSalt(10);
         // Hash the password using the generated salt
-        return bcryptjs_1.default.hashSync(password, salt);
+        return bcryptjs_1.default.hashSync(plainString, salt);
     }
-    static comparepassword(hashPassword, password) {
-        return bcryptjs_1.default.compareSync(password, hashPassword);
+    static comparedata(hashedString, plainString) {
+        return bcryptjs_1.default.compareSync(plainString, hashedString);
     }
     static generateToken(user) {
         return jsonwebtoken_1.default.sign({ id: user.id, iat: Date.now() + 1000 }, JWT_SECRET, {
@@ -27,14 +27,14 @@ class encrypt {
     }
 }
 exports.encrypt = encrypt;
-encrypt.getPasswordResetToken = function (user) {
+encrypt.getPasswordResetOTP = function (user) {
     const resetToken = (0, crypto_1.randomBytes)(32).toString("hex");
-    const passwordResetToken = (0, crypto_1.createHash)("sha256")
+    const passwordResetOTP = (0, crypto_1.createHash)("sha256")
         .update(resetToken)
         .digest("hex");
     //token expires after 15 minutes
-    const resetTokenExpiresAt = Date.now() + 15 * 60 * 1000;
-    user.resetTokenExpiresAt = resetTokenExpiresAt;
-    user.passwordResetToken = passwordResetToken;
+    const resetTokenExpiresAt = new Date(Date.now() + 15 * 60 * 1000);
+    user.resetOTPExpiresAt = resetTokenExpiresAt;
+    user.passwordResetOTP = passwordResetOTP;
     return resetToken;
 };

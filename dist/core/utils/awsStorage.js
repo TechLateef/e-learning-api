@@ -32,13 +32,14 @@ const multer = __importStar(require("multer"));
 const multer_s3_1 = __importDefault(require("multer-s3"));
 const uuid_1 = require("uuid");
 const path = __importStar(require("path"));
+require("dotenv/config");
 // Create S3 instance using S3Client
 const s3 = new client_s3_1.S3Client({
     credentials: {
         secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY || '',
         accessKeyId: process.env.AWS_ACCESS_KEY_ID || '',
     },
-    region: process.env.AWS_REGION || '',
+    region: process.env.AWS_REGION,
 });
 /**
  * Create multer S3 storage configuration

@@ -1,32 +1,32 @@
 import { Router } from "express";
-// import { AuthService } from "../service/auth.service";
-// import { AuthController } from "../controller/auth.controller";
+import { AuthController } from "../controller/auth.controller";
+import { dtoValidationMiddleware } from "../../../core/middleware/dtoValidationMiddleware";
+import { CreateUserDto } from "../../users/dtos/createUser.dto";
+import { GenerateOTPDto, LoginDTO, TwoFAValidationDTO, VerifyAndEnable2FADto } from "../dto/auth.dto";
+import { ServiceFactory } from "../../../core/factories/service.factory";
 
 
 const authRouter = Router()
 
+const authService = ServiceFactory.getAuthService();
 
-// const authService = new AuthService()
-
-// const authCcontroller = new AuthController(authService)
-
-
-// // Route for user rehisteration
-// authRouter.post('/signup', (req, res, next) => authCcontroller.signUp(req, res, next))
+const authController = new AuthController(authService)
 
 
-// //Route to login user
-// authRouter.post('/login', (req, res, next) => authCcontroller.login(req, res, next))
-
-// //Route for getting user profile
-// authRouter.get('/get-user', (req, res, next) => authCcontroller.getUserByUsername(req, res, next))
+// Route for user rehisteration
+authRouter.post('/signup', dtoValidationMiddleware(CreateUserDto), authController.signup)
 
 
-// //Route to edit user Profile
-// authRouter.patch('/edit-profile', (req, res, next) => authCcontroller.editProfile(req, res, next))
+//Route to login user
+authRouter.post('/login', dtoValidationMiddleware(LoginDTO), authController.login)
 
-// //Route for follow or unfollow user
-// authRouter.patch('/follow-or-unfollow', (req, res, next) => authCcontroller.followOrUnfollow(req, res, next))
-
+authRouter.post('/verify-account', authController.verifyAccount)
 
 
+authRouter.post('/generate-otp', dtoValidationMiddleware(GenerateOTPDto), authController.generateOtp);
+
+authRouter.post('/enable-2fa', dtoValidationMiddleware(VerifyAndEnable2FADto), authController.verifyAndEnable2FA);
+
+authRouter.post('/validate-2fa', dtoValidationMiddleware(TwoFAValidationDTO), authController.verifyOtpToLogin);
+
+export default authRouter;

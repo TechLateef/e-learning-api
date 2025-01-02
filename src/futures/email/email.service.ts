@@ -12,7 +12,7 @@ export class EmailService {
   private from: string;
   private url: string;
   private moduleDir: string;
-  private otp: string;
+  private otp: string | null;
 
   constructor(user: User, url: string, to?: string, otp?: string) {
     this.user = user;

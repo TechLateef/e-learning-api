@@ -1,21 +1,36 @@
 "use strict";
 /**
- * Creates and configure the Express Server
- * Register view engines
- * Register middlewares
- * Register Routes
- * Register Wild catch middlewares
+ * The Entry Point of the application
+ * Sets up following:
+ * Environment Variables
+ * Express server
+ * Database
+ * And Finally Spins up the server
  */
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const express_1 = __importDefault(require("express"));
-const futures_1 = __importDefault(require("./futures"));
-const middleware_1 = __importDefault(require("./core/middleware"));
-const app = (0, express_1.default)();
-// Register Middlewares
-(0, middleware_1.default)(app);
-// Register routers
-(0, futures_1.default)(app);
-exports.default = app;
+require("reflect-metadata");
+const data_source_1 = require("./src/data-source");
+/* Configure Environment Variables */
+require("dotenv/config");
+console.log('getting ready');
+const { PORT = 3000 } = process.env;
+// Setup Express Server
+const index_1 = __importDefault(require("./src/index"));
+// Configure session middleware
+// app.use(session ({
+//     secret: process.env.SESSION_SECRET || "",
+//     resave: false,
+//     saveUninitialized: false,
+// }));
+/* Start Server */
+data_source_1.AppDataSource.initialize()
+    .then(async () => {
+    index_1.default.listen(PORT, () => {
+        console.log("Server is running on http://localhost:" + PORT);
+    });
+    console.log("Data Source has been initialized!");
+})
+    .catch((error) => console.log(error));

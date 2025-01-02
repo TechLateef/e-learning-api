@@ -6,7 +6,7 @@ import { CreateUserDto } from "../../users/dtos/createUser.dto";
 import { User } from "../../users/entities/user.entity";
 import { UserService } from "../../users/service/service.user";
 import { Request, Response } from "express";
-import { LoginDTO, ResetPasswordDTO } from "../dto/auth.dto";
+import { GenerateOTPDto, LoginDTO, ResetPasswordDTO, TwoFAValidationDTO, VerifyAndEnable2FADto } from "../dto/auth.dto";
 import { encrypt } from "../../../core/utils/encrypt.utils";
 import { Snowflake } from "@theinternetfolks/snowflake";
 import { generate } from "otp-generator";
@@ -14,6 +14,7 @@ import { EmailService } from "../../email/email.service";
 import * as OTPAuth from "otpauth";
 import { encode } from "hi-base32";
 import crypto from "crypto";
+import * as jwt from 'jsonwebtoken';
 
 export class AuthService {
     constructor(private readonly userService: UserService, private readonly studentService: StudentService, private readonly instructorService: InstructorService) {
@@ -46,7 +47,7 @@ export class AuthService {
      * @param res Express Response
      * @returns 
      */
-    async signUp(details: CreateUserDto, req: Request, res: Response) {
+    async signUp(details: CreateUserDto, res: Response) {
         try {
             const { role } = details;
             const user = await this.userService.createUser(details, res);
@@ -56,7 +57,7 @@ export class AuthService {
             } else if (role === 'Instructor') {
                 await this.instructorService.createInstructor({ user: newUser })
             }
-            return jsonResponse(StatusCodes.OK, user, res, 'User created successfully');
+            return user;
         } catch (error) {
             console.error(error);
             jsonResponse(StatusCodes.INTERNAL_SERVER_ERROR, '', res);
@@ -66,34 +67,50 @@ export class AuthService {
     }
 
     /**
-     * @description this function give allow user to login
-     * @param details loginDTO
+     * @description this function allows a user to log in
+     * @param details LoginDTO
      * @param res Express Response
      * @returns 
      */
     async login(details: LoginDTO, res: Response) {
         try {
-            const isUser = await this.userService.getUserByEmail(details.email);
-
-            if (!isUser) {
-                jsonResponse(StatusCodes.NOT_FOUND, '', res, 'Invalid email or password');
-                return
-            }
-
-            const isPassword = await encrypt.comparedata(isUser.password, details.password);
-
-            if (!isPassword) {
+            const user = await this.userService.getUserByEmail(details.email);
+            if (!user) {
                 jsonResponse(StatusCodes.NOT_FOUND, '', res, 'Invalid email or password');
                 return;
             }
-            const token = await this.createAndSendToken(isUser, res);
-            const data = { token, isUser }
-            jsonResponse(StatusCodes.OK, data, res);
+
+            const isPasswordValid = await encrypt.comparedata(user.password, details.password);
+            if (!isPasswordValid) {
+                jsonResponse(StatusCodes.NOT_FOUND, '', res, 'Invalid email or password');
+                return;
+            }
+
+            // Check if 2FA is enabled
+            if (user.twoFactorEnabled) {
+                // Respond with a temporary token for 2FA
+                const tempToken = this.createTemporaryToken(user.id); // Temporary token creation logic
+                jsonResponse(StatusCodes.OK, { requires2FA: true, tempToken }, res);
+                return;
+            }
+
+            // Issue JWT directly for non-2FA users
+            const token = await this.createAndSendToken(user, res);
+            return { token, user }
         } catch (error) {
-            console.error(error)
-            jsonResponse(StatusCodes.INTERNAL_SERVER_ERROR, '', res, `Error: ${error}`)
+            console.error(error);
+            jsonResponse(StatusCodes.INTERNAL_SERVER_ERROR, '', res, `Error: ${error}`);
         }
     }
+
+    /**
+     * Temporary token creation logic
+     */
+    createTemporaryToken(userId: string) {
+        // Implement your temporary token logic, e.g., a short-lived JWT
+        return jwt.sign({ userId }, process.env.TEMP_TOKEN_SECRET!, { expiresIn: '5m' });
+    }
+
 
 
     /**
@@ -103,7 +120,7 @@ export class AuthService {
      * @param res Express response
      * @returns void
      */
-    async forgetPassword(email: string, res: Response): Promise<void> {
+    async forgetPassword(email: string, res: Response): Promise<void | string> {
         try {
             const user = await this.userService.getUserByEmail(email);
             const genericMessage = 'If an account with this email exists, an OTP has been sent to your email.';
@@ -124,7 +141,7 @@ export class AuthService {
             // Send email
             await new EmailService(user, '', '', otp).sendPasswordReset();
 
-            return jsonResponse(StatusCodes.OK, null, res, genericMessage);
+            return genericMessage
         } catch (error) {
             console.error('Error in forgetPassword:', error);
             return jsonResponse(
@@ -144,7 +161,7 @@ export class AuthService {
      * @returns void
      */
 
-    async verifyAccount(otp: string, res: Response) {
+    async verifyAccount(otp: string, res: Response): Promise<string| void> {
         try {
             const hashedOtp = await encrypt.encryptdata(otp);
             const user = await this.userService.findUserByOTP(hashedOtp);
@@ -156,8 +173,9 @@ export class AuthService {
             }
 
             await this.userService.updateUser(user, { verified: true });
+            const message = 'Account verified ✅ please login'
 
-            jsonResponse(StatusCodes.OK, '', res, 'Account verified ✅ please login')
+            return message;
         } catch (error) {
             console.error(error);
             jsonResponse(StatusCodes.INTERNAL_SERVER_ERROR, '', res, `Error verifying user account: ${error}`)
@@ -171,7 +189,7 @@ export class AuthService {
      * @param res Express Response
      * @returns void
      */
-    async resetpassword(details: ResetPasswordDTO, res: Response): Promise<void> {
+    async resetpassword(details: ResetPasswordDTO, res: Response): Promise<void | string> {
         try {
             const { OTP, newPassword } = details;
 
@@ -188,13 +206,13 @@ export class AuthService {
 
             // Update user data
             await this.userService.updateUser(user, {
-                otp: null,
-                otpExpiresAt: null,
+                otp: undefined,
+                otpExpiresAt: undefined,
                 password: newPassword // Will be hashed by @BeforeUpdate hook in User entity
             });
 
             // Respond with success
-            jsonResponse(StatusCodes.OK, '', res, 'Password has been reset successfully');
+            return 'Password has been reset successfully'
         } catch (error) {
             // Narrow the error type
             if (error instanceof Error) {
@@ -219,10 +237,11 @@ export class AuthService {
      * @description generate OTP for Two factor Authentiaction
      * @param userId string user uniquer Id
      * @param res Express Response
-     * @returns 
+     * @returns void or otpurl
      */
-    async generateOTP(userId: string, res: Response) {
+    async generateOTP(details: GenerateOTPDto , res: Response): Promise<string | void> {
         try {
+            const {userId} = details;
             const user = await this.userService.getUserById(userId);
             if (!user) {
                 jsonResponse(StatusCodes.NOT_FOUND, '', res, 'User not found');
@@ -240,16 +259,23 @@ export class AuthService {
 
             let otpAuthUrl = totp.toString();
             await this.userService.updateUser(user, { otpAuthUrl, otpBase32: base32Secret });
-            jsonResponse(StatusCodes.OK, '', res)
+           return otpAuthUrl;
         } catch (error) {
             console.error(error);
             jsonResponse(StatusCodes.INTERNAL_SERVER_ERROR, '', res, `Error generatingOTP: ${error}`);
         }
     }
 
-
-    async verfyOTP(token: string, userId: string, res: Response) {
+    /**
+     * @description verify otp and enable 2FA
+     * @param token string otp from 2fa
+     * @param userId string user Id
+     * @param res Express Response
+     * @returns 
+     */
+    async verifyOTP(details: VerifyAndEnable2FADto, res: Response) {
         try {
+            const {otp, userId} = details
             const user = await this.userService.getUserById(userId);
             const message = "Token is invalid or User doesn't exist";
             if (!user) {
@@ -264,13 +290,13 @@ export class AuthService {
                 digits: 6,
                 secret: user.otpBase32,
             });
-            const delta = totp.validate({ token });
+            const delta = totp.validate({ token:otp });
             if (delta === null) {
                 jsonResponse(StatusCodes.BAD_REQUEST, '', res, message);
             };
             const updatedUser = await this.userService.updateUser(user, { twoFactorEnabled: true, twoFactVerified: true });
 
-            jsonResponse(StatusCodes.OK, updatedUser, res);
+            return updatedUser;
         } catch (error) {
             console.error(error)
             jsonResponse(StatusCodes.INTERNAL_SERVER_ERROR, '', res, `Error verifying OTP: ${error} `)
@@ -278,8 +304,20 @@ export class AuthService {
 
     }
 
-    async validateOTP(token: string, userId: string, res: Response) {
+
+
+    /**
+     * @description Verifies the OTP for a user
+     * @param details TwoFAValidationDTO
+     * @param res Express Response
+     */
+    async validateOTP(details: TwoFAValidationDTO, res: Response) {
         try {
+            const { tempToken, otp } = details;
+
+            // Decode the temporary token to get userId
+            const decoded = jwt.verify(tempToken, process.env.TEMP_TOKEN_SECRET!);
+            const { userId } = decoded as { userId: string }
             const user = await this.userService.getUserById(userId);
             const message = "Token is invalid or user doesn't exist";
             if (!user) {
@@ -293,13 +331,14 @@ export class AuthService {
                 digits: 6,
                 secret: user.otpBase32,
             });
-            let delta = totp.validate({ token, window: 1 });
-            if (delta === null) {
+            let delta = totp.validate({ token: otp, window: 1 });
+            if (!delta) {
                 jsonResponse(StatusCodes.BAD_REQUEST, '', res, message);
                 return;
             }
-            jsonResponse(StatusCodes.OK, { otp_Valide: true }, res)
-
+            // Issue final JWT upon successful 2FA verification
+            const token = await this.createAndSendToken(user, res);
+            return { token, user };
         } catch (error) {
             console.error(error);
             jsonResponse(StatusCodes.INTERNAL_SERVER_ERROR, '', res, `Error valiadting OTP: ${error}`)
