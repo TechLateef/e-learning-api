@@ -60,4 +60,5 @@ const authorize = async (...allowedRoles: string[]) => {
         return jsonResponse(StatusCodes.UNAUTHORIZED, '', res)
     }
 }
-export { authenticationMiddleware, authorize };
+export {  authorize };
+export default authenticationMiddleware

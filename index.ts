@@ -8,15 +8,14 @@
  */
 
 import "reflect-metadata";
+import { AppDataSource } from './src/data-source';
 
-import { AppDataSource } from './src/data-source'
 
-import session from 'express-session';
+
+import * as session from 'express-session';
 
 /* Configure Environment Variables */
 import 'dotenv/config'
-
-console.log('getting ready');
 
 const { PORT = 3000 } = process.env;
 
@@ -24,22 +23,22 @@ const { PORT = 3000 } = process.env;
 import app from './src/index'
 
 
-
 // Configure session middleware
-// app.use(session ({
-//     secret: process.env.SESSION_SECRET || "",
-//     resave: false,
-//     saveUninitialized: false,
-// }));
+app.use(session.default({
+  secret: process.env.SESSION_SECRET || "",
+  resave: false,
+  saveUninitialized: false,
+}));
 
 
 
 /* Start Server */
 AppDataSource.initialize()
-    .then(async () => {
-        app.listen(PORT, () => {
-            console.log("Server is running on http://localhost:" + PORT);
-        });
-        console.log("Data Source has been initialized!");
-    })
-    .catch((error) => console.log(error));
+  .then(async () => {
+    app.listen(PORT, () => {
+      console.log("Server is running on http://localhost:" + PORT);
+    });
+    console.log("Data Source has been initialized!");
+  })
+  .catch((error) => console.log(error));
+  

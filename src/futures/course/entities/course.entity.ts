@@ -1,5 +1,4 @@
-import { Column, CreateDateColumn, Entity, ManyToMany, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
-import { User } from "../../users/entities/user.entity";
+import { Column, CreateDateColumn, Entity, ManyToMany, OneToMany, PrimaryColumn, UpdateDateColumn } from "typeorm";
 import { Module } from "../../modules/entities/module.entity";
 import { Enrollment } from "../../enrollment/entities/enrollment.entity";
 import { Accessment } from "../../accessment/entities/accessment.entity";
@@ -8,7 +7,7 @@ import { Instructor } from "../../instructor/entities/instructor.entity";
 
 @Entity('course')
 export class Course {
-    @PrimaryGeneratedColumn()
+    @PrimaryColumn('uuid')
     id: number;
 
     @ManyToMany(() => Instructor, instructor => instructor.courses)
@@ -22,6 +21,7 @@ export class Course {
 
     @OneToMany(() => Module, module => module.course)
     modules: Module[]
+
     @OneToMany(() => Accessment, accessment => accessment.course)
     accessments: Accessment[];
 
@@ -34,6 +34,7 @@ export class Course {
 
     @Column()
     category: string;
+
 
     @CreateDateColumn()
     CreateAt: Date;

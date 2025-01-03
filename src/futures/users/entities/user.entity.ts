@@ -47,6 +47,9 @@ export class User {
     @Column({ type: "enum", enum: ROLE })
     role: ROLE;
 
+    @Column({nullable: true})
+    profileUrl: string;
+
     @OneToOne(() => Instructor, (instructor) => instructor.user)
     instructor: Instructor;
 
