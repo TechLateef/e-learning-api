@@ -4,7 +4,7 @@ import { InstructorService } from "../../instructor/service/instructor.service";
 import { StudentService } from "../../students/service/student.service";
 import { CreateUserDto } from "../../users/dtos/createUser.dto";
 import { User } from "../../users/entities/user.entity";
-import { UserService } from "../../users/service/service.user";
+import { UserService } from "../../users/service/user.service";
 import { Request, Response } from "express";
 import {
   GenerateOTPDto,

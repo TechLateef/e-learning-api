@@ -6,7 +6,7 @@ import { InstructorService } from "../../futures/instructor/service/instructor.s
 import { Student } from "../../futures/students/entities/student.entity";
 import { StudentService } from "../../futures/students/service/student.service";
 import { User } from "../../futures/users/entities/user.entity";
-import { UserService } from "../../futures/users/service/service.user";
+import { UserService } from "../../futures/users/service/user.service";
 
 export class ServiceFactory {
     private static userService: UserService;

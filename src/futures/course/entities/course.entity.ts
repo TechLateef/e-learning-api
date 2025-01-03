@@ -3,12 +3,17 @@ import { Module } from "../../modules/entities/module.entity";
 import { Enrollment } from "../../enrollment/entities/enrollment.entity";
 import { Accessment } from "../../accessment/entities/accessment.entity";
 import { Instructor } from "../../instructor/entities/instructor.entity";
+import { Expose } from "class-transformer";
 
 
 @Entity('course')
 export class Course {
     @PrimaryColumn('uuid')
-    id: number;
+    id: string;
+
+    @Column()
+    @Expose()
+    title: string;
 
     @ManyToMany(() => Instructor, instructor => instructor.courses)
     instructors: Instructor[]
@@ -17,7 +22,7 @@ export class Course {
     duration: number;
 
     @Column({ default: true })
-    is_available: boolean;
+    isAvailable: boolean;
 
     @OneToMany(() => Module, module => module.course)
     modules: Module[]
