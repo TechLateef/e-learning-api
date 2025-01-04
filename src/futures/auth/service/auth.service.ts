@@ -21,7 +21,7 @@ import { generate } from "otp-generator";
 import { EmailService } from "../../email/email.service";
 import * as OTPAuth from "otpauth";
 import { encode } from "hi-base32";
-import crypto from "crypto";
+import crypto, { randomUUID } from "crypto";
 import * as jwt from "jsonwebtoken";
 
 export class AuthService {
@@ -57,12 +57,14 @@ export class AuthService {
   async signUp(details: CreateUserDto, res: Response) {
     try {
       const { role } = details;
+      const id = randomUUID();
+        details.id = id;
       const user = await this.userService.createUser(details, res);
       const newUser = user as User;
       if (role === "Student") {
-        await this.studentService.createStudent({ user: newUser });
+        await this.studentService.createStudent({ user: newUser, id });
       } else if (role === "Instructor") {
-        await this.instructorService.createInstructor({ user: newUser });
+        await this.instructorService.createInstructor({ user: newUser, id });
       }
       return user;
     } catch (error) {

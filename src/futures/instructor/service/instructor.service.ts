@@ -20,4 +20,10 @@ export class InstructorService {
           throw new Error("Failed to create instructor. Please try again.");
         }
       }
+
+
+      async findById(instructorId: string): Promise<Instructor | null> {
+        const instructor = await this.instructorRepo.findOne({ where: {id: instructorId}})
+        return instructor;
+      }
 }

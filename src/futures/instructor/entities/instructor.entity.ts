@@ -1,11 +1,11 @@
-import { Entity, PrimaryGeneratedColumn, ManyToMany, OneToMany, JoinTable, ManyToOne } from "typeorm";
+import { Entity, ManyToMany, OneToMany, JoinTable, ManyToOne, PrimaryColumn } from "typeorm";
 import { Course } from "../../course/entities/course.entity";
 import { Accessment } from "../../accessment/entities/accessment.entity";
 import { User } from "../../users/entities/user.entity";
 
 @Entity({ name: 'access_instructor'})
 export class Instructor {
-  @PrimaryGeneratedColumn('uuid')
+  @PrimaryColumn('uuid')
   id: string;
 
   @ManyToOne(() => User, (user) => user.id, { cascade: true, eager: true })

@@ -1,33 +1,34 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { ACCESSMENT_TYPES } from "../../../core/utils/enums";
 import { Course } from "../../course/entities/course.entity";
 import { Instructor } from "../../instructor/entities/instructor.entity";
 import { Student } from "../../students/entities/student.entity";
+import { Submission } from "../../submission/entities/submission.entity";
 
-@Entity({ name:'access_accessment'})
-
+@Entity({ name: 'accessments' })
 export class Accessment {
-    @PrimaryGeneratedColumn()
-    id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
-    @Column()
-    accessment_type: ACCESSMENT_TYPES;
+  @Column({ type: 'enum', enum: ACCESSMENT_TYPES })
+  accessmentType: ACCESSMENT_TYPES; // E.g., TEST, EXAM, ASSIGNMENT
 
-    @Column()
-    description: string;
+  @Column()
+  title: string; // Title of the assessment
 
-    @Column()
-    grade: number;
+  @Column({ nullable: true })
+  description: string; // Description or instructions for the assessment
 
-    @Column()
-    feedback: string;
+  @Column({ nullable: true })
+  maxGrade: number; // Maximum possible grade for this assessment
 
-    @ManyToOne(() => Course, course => course.accessments)
-    course: Course
+  @ManyToOne(() => Course, (course) => course.accessments, { nullable: false })
+  course: Course;
 
-    @ManyToOne(() => Student, Student => Student.user)
-    student: Student;
+  @ManyToOne(() => Instructor, (instructor) => instructor.studentAccessments, { nullable: false })
+  instructor: Instructor;
 
-    @ManyToOne(() => Instructor, instructor => instructor.studentAccessments)
-    instructor: Instructor
+  // One assessment can have multiple submissions (one per student or multiple attempts per student)
+  @OneToMany(() => Submission, (submission) => submission.accessment)
+  submissions: Submission[];
 }

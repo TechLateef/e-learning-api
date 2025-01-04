@@ -7,13 +7,18 @@ import { Student } from "../../futures/students/entities/student.entity";
 import { StudentService } from "../../futures/students/service/student.service";
 import { User } from "../../futures/users/entities/user.entity";
 import { UserService } from "../../futures/users/service/user.service";
+import { AccessmentService } from "../../futures/accessment/service/accessment.service";
+import { CourseService } from "../../futures/course/service/course.service";
+import { Course } from "../../futures/course/entities/course.entity";
+import { Accessment } from "../../futures/accessment/entities/accessment.entity";
 
 export class ServiceFactory {
     private static userService: UserService;
     private static instructorService: InstructorService;
     private static studentService: StudentService;
     private static authService: AuthService;
-
+    private static accessmentService: AccessmentService;
+    private static courseService: CourseService;
     // Method to get UserService
     static getUserService(): UserService {
         if (!this.userService) {
@@ -41,6 +46,15 @@ export class ServiceFactory {
         return this.studentService;
     }
 
+    // Method to get StudentService
+    static getCourseService(): CourseService {
+        if (!this.studentService) {
+            const courseRepo: Repository<Course> = AppDataSource.getRepository(Course);
+            this.courseService = new CourseService(courseRepo);
+        }
+        return this.courseService;
+    }
+
     // Method to get AuthService
     static getAuthService(): AuthService {
         if (!this.authService) {
@@ -50,5 +64,16 @@ export class ServiceFactory {
             this.authService = new AuthService(userService, studentService, instructorService);
         }
         return this.authService;
+    }
+    
+    // Method to get AccessmnetService
+    static getAccessmentService(): AccessmentService {
+        if(!this.accessmentService) {
+            const accessmentRepo: Repository<Accessment> = AppDataSource.getRepository(Accessment);
+            const courseService = this.getCourseService();
+            const instructorService = this.getInstructorService();
+            this.accessmentService = new AccessmentService(accessmentRepo,courseService, instructorService);
+        }
+        return this.accessmentService;
     }
 }
