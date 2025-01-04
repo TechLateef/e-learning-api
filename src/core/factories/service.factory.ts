@@ -11,6 +11,8 @@ import { AccessmentService } from "../../futures/accessment/service/accessment.s
 import { CourseService } from "../../futures/course/service/course.service";
 import { Course } from "../../futures/course/entities/course.entity";
 import { Accessment } from "../../futures/accessment/entities/accessment.entity";
+import { SubmissionService } from "../../futures/submission/service/submission.service";
+import { Submission } from "../../futures/submission/entities/submission.entity";
 
 export class ServiceFactory {
     private static userService: UserService;
@@ -19,6 +21,7 @@ export class ServiceFactory {
     private static authService: AuthService;
     private static accessmentService: AccessmentService;
     private static courseService: CourseService;
+    private static submissionService: SubmissionService;
     // Method to get UserService
     static getUserService(): UserService {
         if (!this.userService) {
@@ -75,5 +78,17 @@ export class ServiceFactory {
             this.accessmentService = new AccessmentService(accessmentRepo,courseService, instructorService);
         }
         return this.accessmentService;
+    }
+
+    // Method to get SubmissionService
+    static getSubmissionService(): SubmissionService {
+        if(!this.submissionService) {
+            const submissionRepo: Repository<Submission> = AppDataSource.getRepository(Submission);
+            const accessmentService = this.getAccessmentService()
+            const studentService = this.getStudentService();
+            this.submissionService = new SubmissionService(submissionRepo, accessmentService, studentService);
+            
+        }
+        return this.submissionService;
     }
 }

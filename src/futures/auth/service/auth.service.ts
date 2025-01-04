@@ -48,7 +48,8 @@ export class AuthService {
   /**
    * @description this function create new user depending on there role
    * @dev I have handle input validation on the DTO level
-   * so it wont pass through if the role is not included in the known role
+   * so it wont pass through if the role is not included in the known role 
+   * @dev Also id is generate here to synce userId and student or instructor id depending on which is created
    * @param details createUserDTO
    * @param req Express Request
    * @param res Express Response
