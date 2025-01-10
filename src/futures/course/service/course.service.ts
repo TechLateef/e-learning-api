@@ -1,6 +1,6 @@
 import { Repository } from "typeorm";
 import { Course } from "../entities/course.entity";
-import { CreateCourseDTO } from "../dtos/course.dto";
+import { CreateCourseDTO, FetchCourseQueryDTO } from "../dtos/course.dto";
 import { Response } from "express";
 import jsonResponse from "../../../core/utils/lib";
 import { StatusCodes } from "http-status-codes";
@@ -40,25 +40,14 @@ export class CourseService {
   }
   /**
    * @description fetch all course can use to filter and search using page, limit, search category and more
-   * @param page page number
-   * @param limit number of course per page
+   * @param details contains page number, limit, search etc
    * @param res Express response
-   * @param search string search by title
-   * @param category string category
-   * @param level course level optional
-   * @param available boolean
    * @returns
    */
-  async fetchAllCourse(
-    page: number,
-    limit: number,
-    res: Response,
-    search?: string,
-    category?: string,
-    level?: string,
-    available?: boolean
-  ) {
+  async fetchAllCourse(details: FetchCourseQueryDTO, res: Response) {
     try {
+      const { page, limit, search, category, level, available } = details;
+
       // Calculate the offset for pagination
       const offset = (page - 1) * limit;
 

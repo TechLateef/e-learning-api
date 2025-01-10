@@ -16,6 +16,7 @@ export class AuthController {
    * @param req Express Request
    * @param res Express Response
    * @param next Express NextFunction
+   * 
    */
   signup: RequestHandler = async (req, res, next) => {
     try {
