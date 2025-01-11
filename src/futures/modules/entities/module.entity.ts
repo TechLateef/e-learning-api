@@ -5,8 +5,8 @@ import { Course } from "../../course/entities/course.entity";
 @Entity('module')
 
 export class Module{
-    @PrimaryGeneratedColumn()
-    id: number;
+    @PrimaryGeneratedColumn('uuid')
+    id: string;
 
     @ManyToOne(()=> Course, course => course.modules)
     course: Course
@@ -21,13 +21,16 @@ export class Module{
     order: number;
 
     @Column()
-    content_url: string;
+    contentUrl: string[];
 
     @Column()
-    video_url: string;
+    videoUrl: string[];
 
     @Column({default: true})
     is_active: boolean;
+
+    @Column({default: false})
+    completed: boolean;
 
     @CreateDateColumn()
     CreateAt: Date;

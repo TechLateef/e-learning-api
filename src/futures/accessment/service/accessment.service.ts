@@ -90,7 +90,14 @@ export class AccessmentService {
   async findById(accessmentId: string): Promise<Accessment | null> {
     const accessment = await this.accessmentRepo.findOne({
       where: { id: accessmentId },
+      relations: ["course"],
     });
     return accessment;
   }
+
+  // user will take assementlet say inform of text or document and submit that user will have to be enroll in that course and the course will have to be available approach
+  // fetch  course accessment where user is enrolled
+  // and check if course is available
+  // if available  user can know submit and the accessemnt will be updated
+  async takeAccessment() {}
 }

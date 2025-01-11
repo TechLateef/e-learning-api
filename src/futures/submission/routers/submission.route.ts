@@ -19,7 +19,7 @@ const submissionController = new SubmissionController(submissionService)
 
 const submissionRouter = Router()
 
-submissionRouter.use(authenticationMiddleware as express.RequestHandler )/** * @route PATCH /profile-update * @description Updates the authenticated user's profile * @access protected *//** * @route PATCH /profile-update * @description Updates the authenticated user's profile * @access protected */
+submissionRouter.use(authenticationMiddleware )
 
 
 /**

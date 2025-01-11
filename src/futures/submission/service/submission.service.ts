@@ -38,6 +38,10 @@ export class SubmissionService {
         );
         return;
       }
+      if (!accessment.course.isAvailable) {
+        jsonResponse(StatusCodes.NOT_FOUND, "", res, "Course not available");
+        return;
+      }
       if (!student) {
         jsonResponse(
           StatusCodes.NOT_FOUND,
@@ -78,12 +82,11 @@ export class SubmissionService {
     return submision;
   }
 
-
   /**
-   * 
+   *
    * @param details GradingDetails e.g grade and instructor feedBack
-   * @param res 
-   * @returns 
+   * @param res
+   * @returns
    */
   async gradeAccessment(details: GradeSubmissionDto, res: Response) {
     //Retrieve Submission by its id and make sure only instructor that created this can grade it
