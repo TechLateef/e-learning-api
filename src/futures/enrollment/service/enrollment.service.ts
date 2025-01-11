@@ -1,6 +1,9 @@
-import { Repository } from "typeorm";
+import { Like, Repository } from "typeorm";
 import { Enrollment } from "../entities/enrollment.entity";
-import { EnrollStudentDTO } from "../dtos/enrollment.dto";
+import {
+  EnrollStudentDTO,
+  FetchEnrollCourseQueryDTO,
+} from "../dtos/enrollment.dto";
 import { StudentService } from "../../students/service/student.service";
 import { CourseService } from "../../course/service/course.service";
 import jsonResponse from "../../../core/utils/lib";
@@ -68,6 +71,54 @@ export class EnrollmentService {
         undefined,
         res,
         `Error processing enrollment: ${error}`
+      );
+    }
+  }
+
+  /**
+   * @description Retrieve all enrolled courses for a student
+   * @param details Contains page, limit, search, and studentId
+   * @param res Express Response
+   * @returns An object containing enrolled courses and the total count
+   */
+  async getStudentEnrolledCourse(
+    details: FetchEnrollCourseQueryDTO,
+    res: Response
+  ) {
+    try {
+      const { page = 1, limit = 10, search, studentId } = details;
+
+      if (!studentId) {
+        return jsonResponse(
+          StatusCodes.BAD_REQUEST,
+          undefined,
+          res,
+          "Student ID is required."
+        );
+      }
+
+      const offset = (page - 1) * limit;
+
+      const query: any = {
+        skip: offset,
+        take: limit,
+        where: { student: { id: studentId } }, // Filter by studentId
+        relations: ["course"], // Eager-load course details
+      };
+
+      if (search) {
+        query.where.course = { title: Like(`%${search}%`) };
+      }
+
+      const [data, total] = await this.enrollmentRepo.findAndCount(query);
+
+      return { data, total };
+    } catch (error) {
+      return jsonResponse(
+        StatusCodes.INTERNAL_SERVER_ERROR,
+        undefined,
+        res,
+        `Error fetching student enrolled courses: ${error}`
       );
     }
   }

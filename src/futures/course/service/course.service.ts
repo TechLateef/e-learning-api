@@ -89,7 +89,7 @@ export class CourseService {
         StatusCodes.INTERNAL_SERVER_ERROR,
         undefined,
         res,
-        `Error fetch course: ${error}`
+        `Error fetching course: ${error}`
       );
     }
   }

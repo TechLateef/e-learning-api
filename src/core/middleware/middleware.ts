@@ -12,53 +12,93 @@ import { User } from "../../futures/users/entities/user.entity";
 //     email: string;
 // }
 
-
-const authenticationMiddleware = async (req: Request, res: Response, next: NextFunction) => {
-    // If user is already authenticated
+const authenticationMiddleware: RequestHandler = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
     if (req.user?.id) return next();
 
     const authHeader = req.headers.authorization;
-    let token;
-    if (authHeader && authHeader.startsWith("Bearer")) {
-        token = authHeader.split(" ")[1];
+    let token: string | undefined;
+
+    if (authHeader?.startsWith("Bearer")) {
+      token = authHeader.split(" ")[1];
     } else if (req.cookies?.jwt) {
-        token = req.cookies.jwt;
+      token = req.cookies.jwt;
     }
+
     if (!token) {
-        return res.status(StatusCodes.UNAUTHORIZED).json({ message: "You are not logged in, please log in to get access" });
+      jsonResponse(
+        StatusCodes.UNAUTHORIZED,
+        "",
+        res,
+        "You are not logged in, please log in to get access"
+      );
+      return;
     }
 
-    try {
-        const JWT_SECRET = process.env.JWT_SECRET!
-        const decoded: any = jwt.verify(token, JWT_SECRET);
-        const { id, iat } = decoded;
+    const JWT_SECRET = process.env.JWT_SECRET!;
+    const decoded: any = jwt.verify(token, JWT_SECRET);
 
-        // verify if user still exists
-        // console.log("user", decoded)
-        const userRepository = AppDataSource.getRepository(User);
-        const user = await userRepository.findOne({ where: { id: decoded.id } });
-        if (!user) {
-            return next(new Error("The user with this token no longer exists"));
-        }
+    const userRepository = AppDataSource.getRepository(User);
+    const user = await userRepository.findOne({ where: { id: decoded.id } });
 
-        // confirm if user doesn't change password after the token is issued
+    if (!user) {
+      jsonResponse(
+        StatusCodes.UNAUTHORIZED,
+        "",
+        res,
+        "The user with this token no longer exists"
+      );
 
-        req.user = user;
-        req.user.password = ''
-        next();
-    } catch (error) {
-        throw new Error(`Not Authorized ${error}`);
+      return;
     }
+
+    req.user = user;
+    req.user.password = ""; // Clear sensitive data
+    next();
+  } catch (error) {
+    jsonResponse(StatusCodes.UNAUTHORIZED, "", res, `Not Authorized: ${error}`);
+  }
 };
 
-const authorize = async (...allowedRoles: string[]) => {
-    return (req: Request, res: Response, next: NextFunction) => {
-        const userRole = req.user!.role;
-        if (allowedRoles.includes(userRole)) {
-            return next()
-        }
-        return jsonResponse(StatusCodes.UNAUTHORIZED, '', res)
+const authorize = (...allowedRoles: string[]): RequestHandler => {
+  return (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const userRole = req.user?.role;
+
+      if (!userRole) {
+        return jsonResponse(
+          StatusCodes.UNAUTHORIZED,
+          "",
+          res,
+          "User role is missing."
+        );
+      }
+
+      if (allowedRoles.includes(userRole)) {
+        return next();
+      }
+
+      return jsonResponse(
+        StatusCodes.UNAUTHORIZED,
+        "",
+        res,
+        "You do not have permission to perform this action."
+      );
+    } catch (error) {
+      return jsonResponse(
+        StatusCodes.INTERNAL_SERVER_ERROR,
+        "",
+        res,
+        `Authorization error: ${error}`
+      );
     }
-}
-export {  authorize };
-export default authenticationMiddleware
+  };
+};
+
+export { authorize };
+
+export default authenticationMiddleware;
