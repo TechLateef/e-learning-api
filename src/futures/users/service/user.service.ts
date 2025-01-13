@@ -26,7 +26,7 @@ export class UserService {
                 jsonResponse(StatusCodes.BAD_REQUEST, '', res, `email as already been taken`);
             }
 
-            const newUser = await this.userRepository.create({ ...details })
+            const newUser = this.userRepository.create({ ...details })
 
             const savedUser = await this.userRepository.save(newUser);
             return savedUser;

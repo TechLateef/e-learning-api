@@ -11,7 +11,7 @@ import {
   import { Course } from "../../course/entities/course.entity";
   import { Student } from "../../students/entities/student.entity";
   
-  @Entity('Enrollment')
+  @Entity('e_Enrollment')
   @Index(["student", "course"], { unique: true }) // Ensures unique enrollment per student-course pair
   export class Enrollment {
     @PrimaryGeneratedColumn('uuid')

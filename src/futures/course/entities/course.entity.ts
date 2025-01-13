@@ -13,7 +13,7 @@ import { Accessment } from "../../accessment/entities/accessment.entity";
 import { Instructor } from "../../instructor/entities/instructor.entity";
 import { Expose } from "class-transformer";
 
-@Entity("course")
+@Entity("e_course")
 export class Course {
   @PrimaryColumn("uuid")
   id: string;

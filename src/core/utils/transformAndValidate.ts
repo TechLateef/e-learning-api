@@ -1,4 +1,4 @@
-import { plainToClass } from 'class-transformer';
+import { plainToClass, plainToInstance } from 'class-transformer';
 import { validate, ValidationError } from 'class-validator';
 import { Request, Response, NextFunction } from 'express';
 
@@ -19,4 +19,16 @@ export async function transformAndValidate<T extends object>(dtoClass: new () =>
     }
 
     return dto;
+}
+
+
+/**
+ * 
+ * @param dtoClass The class to transform/serialize the plain object to
+ * @param plainObject the main entity response 
+ * @returns the transform response
+ */
+export async function transformResponse<T extends object>(dtoClass: new () => T, plainObject: object): Promise<T> {
+    const responseData = plainToInstance(dtoClass, plainObject, {excludeExtraneousValues: true})
+    return responseData;
 }

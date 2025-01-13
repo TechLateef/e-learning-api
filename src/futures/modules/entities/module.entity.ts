@@ -2,7 +2,7 @@ import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, Up
 import { Course } from "../../course/entities/course.entity";
 
 
-@Entity('module')
+@Entity('e_module')
 
 export class Module{
     @PrimaryGeneratedColumn('uuid')
@@ -20,10 +20,10 @@ export class Module{
     @Column()
     order: number;
 
-    @Column()
+    @Column( { type: 'text', array: true, nullable: true })
     contentUrl: string[];
 
-    @Column()
+    @Column({ type: 'text', array: true, nullable: true })
     videoUrl: string[];
 
     @Column({default: true})

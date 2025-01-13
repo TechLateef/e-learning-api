@@ -98,7 +98,13 @@ export class UserResponseDTO {
   email: string;
 
   @Expose()
-  name: string;
+  username: string;
+
+  @Exclude()
+  twoFactorSecret: string
+
+  @Exclude()
+  resetOTPExpiresAt: string
 
   @Exclude()
   password: string;
@@ -118,8 +124,6 @@ export class UserResponseDTO {
   @Exclude()
   passwordResetOTP: string;
 
-  @Exclude()
-  resetOTPExpiresAt: Date;
 
   @Exclude()
   otpExpiresAt: Date;

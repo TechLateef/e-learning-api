@@ -33,7 +33,7 @@ export class AuthService {
 
   public async createAndSendToken(user: User, res: Response) {
     try {
-      const token = await encrypt.generateToken(user);
+      const token = encrypt.generateToken(user);
       res.cookie("jwt", token, {
         expires: new Date(Date.now() + 1 * 24 * 60 * 60),
         secure: process.env.NODE_ENV === "production",
@@ -48,7 +48,7 @@ export class AuthService {
   /**
    * @description this function create new user depending on there role
    * @dev I have handle input validation on the DTO level
-   * so it wont pass through if the role is not included in the known role 
+   * so it wont pass through if the role is not included in the known role
    * @dev Also id is generate here to synce userId and student or instructor id depending on which is created
    * @param details createUserDTO
    * @param req Express Request
@@ -58,9 +58,8 @@ export class AuthService {
   async signUp(details: CreateUserDto, res: Response) {
     try {
       const { role } = details;
-      const id = randomUUID();
-        details.id = id;
       const user = await this.userService.createUser(details, res);
+      const id = (user as User).id;
       const newUser = user as User;
       if (role === "Student") {
         await this.studentService.createStudent({ user: newUser, id });
@@ -115,9 +114,7 @@ export class AuthService {
         return;
       }
 
-      // Issue JWT directly for non-2FA users
-      const token = await this.createAndSendToken(user, res);
-      return { token, user };
+      return user;
     } catch (error) {
       console.error(error);
       jsonResponse(

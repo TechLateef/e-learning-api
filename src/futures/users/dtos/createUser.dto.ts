@@ -1,26 +1,20 @@
-import { IsEnum, IsNotEmpty, IsString, IsUUID } from "class-validator"
-import { ROLE } from "../../../core/utils/enums"
+import { IsEnum, IsNotEmpty, IsString, IsUUID } from "class-validator";
+import { ROLE } from "../../../core/utils/enums";
 
 export class CreateUserDto {
+  @IsString()
+  @IsNotEmpty()
+  username: string;
 
-    @IsUUID()
-    @IsNotEmpty()
-    id: string;
+  @IsString()
+  @IsNotEmpty()
+  email: string;
 
-    @IsString()
-    @IsNotEmpty()
-    username: string
+  @IsString()
+  @IsNotEmpty()
+  password: string;
 
-    @IsString()
-    @IsNotEmpty()
-    email: string
-
-    @IsString()
-    @IsNotEmpty()
-    password: string
-
-    @IsNotEmpty()
-    @IsEnum(ROLE)
-    role: ROLE;
-
+  @IsNotEmpty()
+  @IsEnum(ROLE)
+  role: ROLE;
 }

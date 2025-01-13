@@ -2,7 +2,7 @@ import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, CreateDateColumn, Up
 import { Student } from "../../students/entities/student.entity";
 import { Accessment } from "../../accessment/entities/accessment.entity";
 
-@Entity({ name: 'accessment_submissions' })
+@Entity({ name: 'e_submissions' })
 export class Submission {
   @PrimaryGeneratedColumn('uuid')
   id: string;

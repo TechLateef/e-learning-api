@@ -15,7 +15,7 @@ import { Accessment } from "../../accessment/entities/accessment.entity";
 import { Instructor } from "../../instructor/entities/instructor.entity";
 import { Student } from "../../students/entities/student.entity";
 import * as bcrypt from 'bcryptjs';
-@Entity({ name: 'access_user'})
+@Entity({ name: 'e_user'})
 export class User {
     @PrimaryGeneratedColumn("uuid")
     id: string;
@@ -94,8 +94,6 @@ export class User {
     @Column({ nullable: true })
     otpExpiresAt: Date;    
 
-    @OneToMany(() => Accessment, (accessment) => accessment.student)
-    accessments: Accessment[];
 
     /**
      * Encrypt The Password before saving it to the database

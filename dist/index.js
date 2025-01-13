@@ -59,11 +59,20 @@ index_1.default.use(session.default({
     saveUninitialized: false,
 }));
 /* Start Server */
-data_source_1.AppDataSource.initialize()
-    .then(async () => {
-    index_1.default.listen(PORT, () => {
-        console.log("Server is running on http://localhost:" + PORT);
-    });
-    console.log("Data Source has been initialized!");
-})
-    .catch((error) => console.log(error));
+/* Start Server */
+const startServer = async () => {
+    try {
+        await data_source_1.AppDataSource.initialize();
+        console.log("Data Source has been initialized!");
+        const PORT = process.env.PORT || 3000; // Default to 3000 if PORT is undefined
+        index_1.default.listen(PORT, () => {
+            console.log(`Server is running on http://localhost:${PORT}`);
+        });
+    }
+    catch (error) {
+        console.error("Error during Data Source initialization:", error);
+        // Exit process with failure code
+        process.exit(1);
+    }
+};
+startServer();

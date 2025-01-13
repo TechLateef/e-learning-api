@@ -5,7 +5,7 @@ import { Instructor } from "../../instructor/entities/instructor.entity";
 import { Student } from "../../students/entities/student.entity";
 import { Submission } from "../../submission/entities/submission.entity";
 
-@Entity({ name: 'accessments' })
+@Entity({ name: 'e_accessments' })
 export class Accessment {
   @PrimaryGeneratedColumn('uuid')
   id: string;

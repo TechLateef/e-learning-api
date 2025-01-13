@@ -2,10 +2,12 @@ import { RequestHandler } from "express";
 import { AuthService } from "../service/auth.service";
 import jsonResponse from "../../../core/utils/lib";
 import { StatusCodes } from "http-status-codes";
-import { plainToInstance } from "class-transformer";
+import { classToPlain, plainToInstance } from "class-transformer";
 import { UserResponseDTO } from "../dto/auth.dto";
 import { User } from "../../users/entities/user.entity";
 import { responseFormat } from "../../../core/utils/responseFormat.utils";
+import { transformResponse } from "../../../core/utils/transformAndValidate";
+import { encrypt } from "../../../core/utils/encrypt.utils";
 
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
@@ -21,7 +23,8 @@ export class AuthController {
   signup: RequestHandler = async (req, res, next) => {
     try {
       const user = await this.authService.signUp(req.body, res);
-      jsonResponse(StatusCodes.OK, user, res);
+      const response = plainToInstance(UserResponseDTO,user, {excludeExtraneousValues: true})
+      jsonResponse(StatusCodes.OK, response, res);
     } catch (error) {
       console.error(error);
       next(error);
@@ -36,8 +39,15 @@ export class AuthController {
    */
   login: RequestHandler = async (req, res, next) => {
     try {
-      const result = await this.authService.login(req.body, res);
-      jsonResponse(StatusCodes.OK, result, res);
+      const user = await this.authService.login(req.body, res);
+      if (!user) {
+        console.log(user);
+        throw new Error('No result found',);
+      }
+      const token = await encrypt.generateToken(user)
+      
+      const userReponse = await transformResponse(UserResponseDTO,(user as User))
+      jsonResponse(StatusCodes.OK, {token, userReponse}, res);
     } catch (error) {
       console.error(error);
       next(error);
