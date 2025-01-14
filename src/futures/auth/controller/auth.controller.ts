@@ -39,15 +39,16 @@ export class AuthController {
    */
   login: RequestHandler = async (req, res, next) => {
     try {
+      
       const user = await this.authService.login(req.body, res);
       if (!user) {
         console.log(user);
         throw new Error('No result found',);
       }
-      const token = await encrypt.generateToken(user)
+      const token =  encrypt.generateToken(user)
       
-      const userReponse = await transformResponse(UserResponseDTO,(user as User))
-      jsonResponse(StatusCodes.OK, {token, userReponse}, res);
+      // const userReponse = await transformResponse(UserResponseDTO,(user as User))
+      jsonResponse(StatusCodes.OK, {token}, res);
     } catch (error) {
       console.error(error);
       next(error);

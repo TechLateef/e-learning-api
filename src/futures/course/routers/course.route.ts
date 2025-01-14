@@ -9,7 +9,7 @@ import { CreateCourseDTO, FetchCourseQueryDTO } from "../dtos/course.dto";
 const ROUTE = {
     ADDCOURSE: '/',
     GET_COURSE: '/'
-}
+} as const
 
 const courseRouter = Router()
 
@@ -20,7 +20,7 @@ const courseController = new CourseController(courseService);
 
 
 
-courseRouter.use(authenticationMiddleware as express.RequestHandler)
+courseRouter.use(authenticationMiddleware)
 
 
 
@@ -39,3 +39,6 @@ courseRouter.post(ROUTE.ADDCOURSE, dtoValidationMiddleware(CreateCourseDTO), cou
  * @access public
  */
 courseRouter.get(ROUTE.GET_COURSE, dtoValidationMiddleware(FetchCourseQueryDTO), courseController.fetchCourse)
+
+
+export default courseRouter;

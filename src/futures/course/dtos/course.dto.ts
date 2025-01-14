@@ -22,7 +22,7 @@ export class CreateCourseDTO {
 export class FetchCourseQueryDTO {
     @IsOptional()
     @IsString()
-    search?: string;
+    search: string;
 
     @IsOptional()
     @IsString()

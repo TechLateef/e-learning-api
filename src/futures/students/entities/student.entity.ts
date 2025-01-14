@@ -2,12 +2,12 @@ import { Entity, OneToMany, JoinColumn, ManyToOne, PrimaryGeneratedColumn, Prima
 import { Enrollment } from "../../enrollment/entities/enrollment.entity";
 import { User } from "../../users/entities/user.entity";
 
-@Entity({ name: 'e_student'})
+@Entity({ name: 'e_students'})
 export class Student {
     @PrimaryColumn('uuid')
     id: string;
 
-    @ManyToOne(() => User, (user) => user.id, { cascade: true, eager: true })
+    @ManyToOne(() => User, (user) => user.id, { onDelete:'CASCADE',onUpdate:'CASCADE', eager: true })
     user: User;
 
 

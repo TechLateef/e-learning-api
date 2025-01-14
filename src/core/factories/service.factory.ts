@@ -55,7 +55,7 @@ export class ServiceFactory {
 
     // Method to get StudentService
     static getCourseService(): CourseService {
-        if (!this.studentService) {
+        if (!this.courseService) {
             const courseRepo: Repository<Course> = AppDataSource.getRepository(Course);
             this.courseService = new CourseService(courseRepo);
         }

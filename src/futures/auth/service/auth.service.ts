@@ -79,37 +79,26 @@ export class AuthService {
    * @param res Express Response
    * @returns
    */
+
   async login(details: LoginDTO, res: Response) {
     try {
       const user = await this.userService.getUserByEmail(details.email);
-      if (!user) {
+
+      if (
+        !user ||
+        !(await encrypt.comparedata(user.password, details.password))
+      ) {
         jsonResponse(
           StatusCodes.NOT_FOUND,
           "",
           res,
-          "Invalid email or password"
+          "Invalid login credentials"
         );
         return;
       }
 
-      const isPasswordValid = await encrypt.comparedata(
-        user.password,
-        details.password
-      );
-      if (!isPasswordValid) {
-        jsonResponse(
-          StatusCodes.NOT_FOUND,
-          "",
-          res,
-          "Invalid email or password"
-        );
-        return;
-      }
-
-      // Check if 2FA is enabled
       if (user.twoFactorEnabled) {
-        // Respond with a temporary token for 2FA
-        const tempToken = this.createTemporaryToken(user.id); // Temporary token creation logic
+        const tempToken = this.createTemporaryToken(user.id);
         jsonResponse(StatusCodes.OK, { requires2FA: true, tempToken }, res);
         return;
       }

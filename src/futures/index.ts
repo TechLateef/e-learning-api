@@ -2,6 +2,7 @@ import { Request, Response } from 'express'
 
 import { uploadImageSingle, getImageUrlSingle } from '../core/utils/uploadHandler';
 import authRouter from './auth/routers/auth.route';
+import courseRouter from './course/routers/course.route';
 
 
 
@@ -16,6 +17,7 @@ const routeRegister = (app: any) => {
 
     app.post(`${basePrefix}/image/upload`, uploadImageSingle, getImageUrlSingle);
     app.use(`${basePrefix}/auth`, authRouter);
+    app.use(`${basePrefix}/course`, courseRouter);
 
   // Catch All
   app.all("*",  (req: Request, res: Response,) => {

@@ -8,6 +8,7 @@ import {
     OneToOne,
     BeforeInsert,
     BeforeUpdate,
+    Index,
 } from "typeorm";
 import { Exclude } from "class-transformer";
 import { ROLE } from "../../../core/utils/enums";
@@ -15,7 +16,8 @@ import { Accessment } from "../../accessment/entities/accessment.entity";
 import { Instructor } from "../../instructor/entities/instructor.entity";
 import { Student } from "../../students/entities/student.entity";
 import * as bcrypt from 'bcryptjs';
-@Entity({ name: 'e_user'})
+@Entity({ name: 'e_users'})
+@Index(["email"], {unique: true})
 export class User {
     @PrimaryGeneratedColumn("uuid")
     id: string;
