@@ -31,6 +31,7 @@ export class CourseService {
   }
 
   /**
+   * 
    * @description get course by Id
    * @param courseId string course Id
    * @param res Express Response
@@ -41,7 +42,7 @@ export class CourseService {
     return course;
   }
   /**
-   * 
+   *
    * @description fetch all course can use to filter and search using page, limit, search category and more
    * @param details contains page number, limit, search etc
    * @param res Express response
@@ -57,12 +58,13 @@ export class CourseService {
       // Start building the query
       const query = this.courseRepo
         .createQueryBuilder("course")
+        .where("course.isAvailable = :isAvailable", { isAvailable: true })
         .skip(offset)
         .take(limit);
 
       // Add search condition if provided
       if (search) {
-        query.andWhere("course.title LIKE :search", { search: `%${search}%` });
+        query.andWhere("course.title ILIKE :search", { search: `%${search}%` });
       }
 
       // Add category filter if provided
@@ -75,8 +77,9 @@ export class CourseService {
         query.andWhere("course.level = :level", { level });
       }
 
+      
       // Add availability filter if provided
-      if (available !== undefined) {
+      if (available) {
         query.andWhere("course.isAvailable = :available", { available });
       }
 

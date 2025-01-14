@@ -84,7 +84,7 @@ Here's an overview of the main API endpoints:
 - **Express** - Web framework for Node.js
 - **PostgreSQL** - Database for storing user, post, and interaction data
 - **MongoDB** - Database for course content and assignments
-- **Jest** - Testing framework (if applicable)
+- **Jest** - Testing framework (jet)
 
 ## Contributing
 
