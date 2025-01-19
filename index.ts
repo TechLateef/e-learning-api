@@ -24,14 +24,14 @@ import app from './src/index'
 
 
 // Configure session middleware
-app.use(session.default({
-  secret: process.env.SESSION_SECRET || "",
-  resave: false,
-  saveUninitialized: false,
-}));
-
-
-
+// app.use(session.default({
+  // secret: process.env.SESSION_SECRET || "",
+  // resave: false,
+  // saveUninitialized: false,
+// }));
+// 
+// 
+// 
 /* Start Server */
 /* Start Server */
 const startServer = async () => {
