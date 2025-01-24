@@ -5,7 +5,7 @@ import { dtoValidationMiddleware } from "../../../core/middleware/dtoValidationM
 import { CreateUserDto } from "../../users/dtos/createUser.dto";
 import { GenerateOTPDto, GetProfileDto, LoginDTO, TwoFAValidationDTO, UpdateUserProfileDto, VerifyAndEnable2FADto } from "../dto/auth.dto";
 import { ServiceFactory } from "../../../core/factories/service.factory";
-import authenticationMiddleware from "../../../core/middleware/middleware";
+import authenticationMiddleware, { loginRatelimit } from "../../../core/middleware/middleware";
 
 // Centralized route paths
 const ROUTES = {
@@ -35,7 +35,7 @@ authRouter.post(ROUTES.SIGNUP, dtoValidationMiddleware(CreateUserDto), authContr
  * @description Logs in a user and returns a JWT token
  * @access public
  */
-authRouter.post(ROUTES.LOGIN, dtoValidationMiddleware(LoginDTO), authController.login);
+authRouter.post(ROUTES.LOGIN, dtoValidationMiddleware(LoginDTO), loginRatelimit,authController.login);
 
 /**
  * @route POST /verify-account

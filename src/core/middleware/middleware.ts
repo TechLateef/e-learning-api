@@ -4,7 +4,7 @@ import { StatusCodes } from "http-status-codes";
 import { AppDataSource } from "../../data-source";
 import jsonResponse from "../utils/lib";
 import { User } from "../../futures/users/entities/user.entity";
-
+import { rateLimit } from "express-rate-limit";
 // interface User {
 //     id: string;
 //     firstName: string;
@@ -40,7 +40,7 @@ const authenticationMiddleware: RequestHandler = async (
     }
 
     const JWT_SECRET = process.env.JWT_SECRET!;
-    const decoded: any = jwt.verify(token, JWT_SECRET);
+    const decoded: any = jwt.verify(token, JWT_SECRET});
 
     const userRepository = AppDataSource.getRepository(User);
     const user = await userRepository.findOne({ where: { id: decoded.id } });
@@ -98,6 +98,16 @@ const authorize = (...allowedRoles: string[]): RequestHandler => {
     }
   };
 };
+
+export const loginRatelimit = rateLimit({
+  windowMs: 15 * 60 * 1000, //15 minute
+  limit: 5, //limit each IP to 5 request per 15 minute
+  message:
+    "Login error, you have reached maximum retries. Please try again after 30 minutes",
+  statusCode: 429,
+  standardHeaders: "draft-8",
+  legacyHeaders: false,
+});
 
 export { authorize };
 
