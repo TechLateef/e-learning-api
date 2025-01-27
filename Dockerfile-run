@@ -1,0 +1,39 @@
+# Build stage: Install app dependencies in a full UBI Node.js docker image
+FROM registry.access.redhat.com/ubi8/nodejs-20:latest AS build
+
+WORKDIR /opt/app-root/src
+
+# Enable pnpm and install dependencies
+RUN npm install -g pnpm@latest
+
+# Copy package.json, pnpm-lock.yaml
+COPY package*.json pnpm-lock.yaml ./
+
+# Install app dependencies using the lockfile
+RUN pnpm install --frozen-lockfile
+
+# Copy the rest of the app files
+COPY . .
+
+# Build the application
+RUN pnpm run build
+
+# Production stage: Use a minimal UBI Node.js docker image
+FROM registry.access.redhat.com/ubi8/nodejs-20-minimal:latest
+
+WORKDIR /opt/app-root/src
+
+# Copy only the production build and node_modules
+COPY --from=build /opt/app-root/src/dist ./dist
+COPY --from=build /opt/app-root/src/node_modules ./node_modules
+
+# Set environment variables
+ENV NODE_ENV=production
+ENV PORT=3000
+
+
+# Expose the app's port
+EXPOSE 3000
+
+# Start the application
+CMD ["node", "dist/index.js"]

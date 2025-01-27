@@ -1,4 +1,12 @@
-/node_modules
 .env
 package-lock.json
 dist
+**/node_modules/
+**/node_modules_linux/
+**/Dockerfile
+**/.dockerignore
+**/.gitignore
+**/.git
+**/README.md
+**/LICENSE
+**/.vscode

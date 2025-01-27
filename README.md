@@ -16,9 +16,9 @@ This project involves building a comprehensive e-learning application where user
 ### Prerequisites
 
 - **Node.js** (>= v14.x.x)
-- **npm** or **yarn**
+- **npm** or **yarn** or **pnpm**
 - **MongoDB** for data storage
-- **PostgreSQL** for data storage (in case of integration with other features)
+- **PostgreSQL** for data storage  
 - **Docker** (optional, for containerized environments)
 
 ### Installation
@@ -33,7 +33,7 @@ This project involves building a comprehensive e-learning application where user
 2. Install dependencies:
 
    ```bash
-   yarn install
+   pnpm install
    ```
 
 3. Configure environment variables:
@@ -49,8 +49,8 @@ This project involves building a comprehensive e-learning application where user
 4. Start the server:
 
    ```bash
-   yarn run build
-   yarn run start
+   pnpm run build
+   pnpm run start
    ```
 
    The API should now be running on `http://localhost:3000`.

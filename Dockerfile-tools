@@ -1,0 +1,41 @@
+# Use Node.js 20 as the base image
+FROM node:20
+
+# Set environment variables
+ENV PORT=3000
+ENV NODE_HEAPDUMP_OPTIONS=nosignal
+
+# Update OS and install required dependencies
+RUN apt-get update && apt-get install -y bc \
+ && apt-get clean \
+ && rm -rf /var/lib/apt/lists/* \
+ && echo 'Finished installing dependencies'
+
+# Install pnpm and nodemon globally
+RUN corepack enable && corepack prepare pnpm@latest --activate \
+ && npm install -g nodemon
+
+# Set the working directory
+WORKDIR /app
+
+# Copy custom scripts to the container
+COPY run-dev /bin/
+COPY run-debug /bin/
+
+# Ensure scripts are executable
+RUN chmod +x /bin/run-dev /bin/run-debug
+
+# Copy application source code
+COPY . /app
+
+# Install only production dependencies
+RUN pnpm install --production
+
+# Expose the application port
+EXPOSE 3000
+
+# Use a non-root user for running the application
+USER node
+
+# Default command to keep the container running (or override with `docker run`)
+CMD ["/bin/bash"]

@@ -40,7 +40,7 @@ const authenticationMiddleware: RequestHandler = async (
     }
 
     const JWT_SECRET = process.env.JWT_SECRET!;
-    const decoded: any = jwt.verify(token, JWT_SECRET});
+    const decoded: any = jwt.verify(token, JWT_SECRET);
 
     const userRepository = AppDataSource.getRepository(User);
     const user = await userRepository.findOne({ where: { id: decoded.id } });
