@@ -27,7 +27,7 @@ export class AccessmentService {
     try {
       //fetch course it must exist and active then we fetch instructor by id too who will be adding the course
       const {
-        intsructorId,
+        instructorId,
         courseId,
         accessmentType,
         maxGrade,
@@ -35,7 +35,7 @@ export class AccessmentService {
         description,
       } = details;
       const course = await this.courseService.findById(courseId);
-      const instructor = await this.instructorService.findById(intsructorId);
+      const instructor = await this.instructorService.findById(instructorId);
 
       if (!course) {
         jsonResponse(StatusCodes.NOT_FOUND, undefined, res, `Course not found`);

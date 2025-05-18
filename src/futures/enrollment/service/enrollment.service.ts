@@ -28,22 +28,26 @@ export class EnrollmentService {
       // Check if the student exists
       const student = await this.studentService.findById(details.studentId);
       if (!student) {
-        return jsonResponse(StatusCodes.NOT_FOUND, res, "Student not found");
+        jsonResponse(StatusCodes.NOT_FOUND, {}, res, "Student not found");
+        return;
       }
 
       // Check if the course exists
       const course = await this.courseService.findById(details.courseId);
       if (!course) {
-        return jsonResponse(StatusCodes.NOT_FOUND, res, "Course not found");
+        jsonResponse(StatusCodes.NOT_FOUND, {}, res, "Course not found");
+        return;
       }
 
       // Check if the course is available
       if (!course.isAvailable) {
-        return jsonResponse(
+        jsonResponse(
           StatusCodes.BAD_REQUEST,
+          {},
           res,
           "Course is not available"
         );
+        return;
       }
 
       // Check if the student is already enrolled in the course
@@ -51,11 +55,13 @@ export class EnrollmentService {
         where: { student: student, course: course },
       });
       if (existingEnrollment) {
-        return jsonResponse(
+        jsonResponse(
           StatusCodes.BAD_REQUEST,
+          {},
           res,
           "Student is already enrolled in this course"
         );
+        return;
       }
 
       // Proceed with enrollment if everything is valid
@@ -66,9 +72,10 @@ export class EnrollmentService {
       const savedEnrollment = await this.enrollmentRepo.save(enrollment);
       return savedEnrollment;
     } catch (error) {
-      return jsonResponse(
+      console.log("Error enrolling student:", error);
+      jsonResponse(
         StatusCodes.INTERNAL_SERVER_ERROR,
-        undefined,
+        {},
         res,
         `Error processing enrollment: ${error}`
       );
@@ -91,7 +98,7 @@ export class EnrollmentService {
       if (!studentId) {
         return jsonResponse(
           StatusCodes.BAD_REQUEST,
-          undefined,
+          {},
           res,
           "Student ID is required."
         );
@@ -116,7 +123,7 @@ export class EnrollmentService {
     } catch (error) {
       return jsonResponse(
         StatusCodes.INTERNAL_SERVER_ERROR,
-        undefined,
+        {},
         res,
         `Error fetching student enrolled courses: ${error}`
       );

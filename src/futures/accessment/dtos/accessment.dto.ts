@@ -21,7 +21,7 @@ export class CreateAccessmentDto {
   @IsString()
   @IsNotEmpty()
   @IsOptional()
-  intsructorId: string;
+  instructorId: string;
 
   @IsNumber()
   @IsNotEmpty()
